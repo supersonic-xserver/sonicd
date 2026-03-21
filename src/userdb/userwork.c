@@ -11,10 +11,12 @@
 #include "errno-util.h"
 #include "fd-util.h"
 #include "group-record.h"
+#include "hashmap.h"
 #include "io-util.h"
 #include "json-util.h"
 #include "main-func.h"
 #include "pidref.h"
+#include "ratelimit.h"
 #include "string-util.h"
 #include "time-util.h"
 #include "user-record.h"
@@ -28,6 +30,13 @@
 #define PRESSURE_SLEEP_TIME_USEC (50 * USEC_PER_MSEC)
 #define CONNECTION_IDLE_USEC (15 * USEC_PER_SEC)
 #define LISTEN_IDLE_USEC (90 * USEC_PER_SEC)
+
+/* Per-uid rate limiters for age verification queries */
+static Hashmap *age_verification_rate_limits = NULL;
+
+static void age_verification_ratelimits_free(void) {
+        hashmap_free(age_verification_rate_limits);
+}
 
 typedef struct LookupParameters {
         const char *name;
@@ -113,6 +122,14 @@ static int build_user_json(sd_varlink *link, UserRecord *ur, sd_json_variant **r
                  !FLAGS_SET(stripped->mask, USER_RECORD_PRIVILEGED));
 
         v = sd_json_variant_ref(stripped->json);
+
+        /* If bypass_age_verification is set, remove birthDate from the response */
+        if (user_record_bypass_age_verification(ur)) {
+                r = sd_json_variant_filter(&v, STRV_MAKE("birthDate"));
+                if (r < 0)
+                        return r;
+        }
+
         r = add_nss_service(&v);
         if (r < 0)
                 return r;
@@ -228,6 +245,43 @@ static int vl_method_get_user_record(sd_varlink *link, sd_json_variant *paramete
         if ((uid_is_valid(p.uid) && hr->uid != p.uid) ||
             (p.name && !user_record_matches_user_name(hr, p.name)))
                 return sd_varlink_error(link, "io.systemd.UserDatabase.ConflictingRecordFound", NULL);
+
+        /* Check if the record has birthDate and apply rate limiting if so */
+        if (hr->birth_date.tm_year > 0) {
+                RateLimit *rl;
+
+                /* Initialize rate limit hashmap on first use */
+                if (!age_verification_rate_limits) {
+                        age_verification_rate_limits = hashmap_new(NULL);
+                        if (!age_verification_rate_limits)
+                                return log_oom();
+                }
+
+                /* Get or create rate limit entry for this uid */
+                rl = hashmap_get(age_verification_rate_limits, UID_TO_PTR(hr->uid));
+                if (!rl) {
+                        /* Create new rate limit entry for this uid */
+                        RateLimit new_rl = {
+                                .interval = user_record_age_verification_poll_interval_usec(hr),
+                                .burst = 1, /* Strict: one query per interval */
+                        };
+
+                        r = hashmap_put(age_verification_rate_limits, UID_TO_PTR(hr->uid), new_rl);
+                        if (r < 0)
+                                return r;
+
+                        rl = hashmap_get(age_verification_rate_limits, UID_TO_PTR(hr->uid));
+                }
+
+                /* Update the interval in case it changed */
+                rl->interval = user_record_age_verification_poll_interval_usec(hr);
+
+                /* Check if we're below the rate limit */
+                if (!ratelimit_below(rl)) {
+                        log_debug("Age verification query rate limited for uid %uid", hr->uid);
+                        return sd_varlink_error(link, "io.systemd.UserDatabase.RateLimited", NULL);
+                }
+        }
 
         _cleanup_(sd_json_variant_unrefp) sd_json_variant *v = NULL;
         r = build_user_json(link, hr, &v);
@@ -590,6 +644,9 @@ static int run(int argc, char *argv[]) {
                 (void) process_connection(server, TAKE_FD(fd));
                 last_busy_usec = USEC_INFINITY;
         }
+
+        /* Cleanup rate limiters before exiting */
+        age_verification_ratelimits_free();
 
         return 0;
 }
