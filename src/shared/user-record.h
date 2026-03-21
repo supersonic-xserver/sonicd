@@ -269,9 +269,12 @@ typedef struct UserRecord {
         char *icon_name;
         char *location;
         struct tm birth_date;
-        /* Age verification bypass admin-only, like birthDate */
+        /* When true, suppresses birthDate from non-privileged userdb
+         * responses. Admin-only. Excluded from selfModifiableFields. */
         bool bypass_age_verification;
-        /* Polling rate cap microseconds between age queries, 0 = unlimited */
+        /* Maximum interval between age verification queries for this user,
+         * in microseconds. UINT64_MAX means use the default (1s).
+         * Admin-only. Excluded from selfModifiableFields. */
         usec_t age_verification_poll_interval_usec;
 
         char *blob_directory;
