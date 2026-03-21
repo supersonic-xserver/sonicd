@@ -270,7 +270,10 @@ typedef struct UserRecord {
         char *location;
         struct tm birth_date;
         /* When true, suppresses birthDate from non-privileged userdb
-         * responses. Admin-only. Excluded from selfModifiableFields. */
+         * responses. Defaults to true — birthDate is not exposed unless
+         * an administrator explicitly sets bypassAgeVerification: false
+         * in the user record. Admin-only. Excluded from
+         * selfModifiableFields. */
         bool bypass_age_verification;
         /* Maximum interval between age verification queries for this user,
          * in microseconds. UINT64_MAX means use the default (1s).

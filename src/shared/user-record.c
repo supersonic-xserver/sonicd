@@ -30,6 +30,7 @@
 #define DEFAULT_RATELIMIT_BURST 30
 #define DEFAULT_RATELIMIT_INTERVAL_USEC (1*USEC_PER_MINUTE)
 #define DEFAULT_AGE_VERIFICATION_POLL_INTERVAL_USEC (1*USEC_PER_SEC)
+#define DEFAULT_BYPASS_AGE_VERIFICATION true
 
 UserRecord* user_record_new(void) {
         UserRecord *h;
@@ -102,6 +103,7 @@ UserRecord* user_record_new(void) {
                 .tmp_limit = TMPFS_LIMIT_NULL,
                 .dev_shm_limit = TMPFS_LIMIT_NULL,
                 .age_verification_poll_interval_usec = UINT64_MAX,
+                .bypass_age_verification = DEFAULT_BYPASS_AGE_VERIFICATION,
         };
 
         return h;
