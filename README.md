@@ -1,42 +1,76 @@
-![Systemd](http://brand.systemd.io/assets/page-logo.png)
+# sonicd
 
-System and Service Manager
+A fork of systemd with age verification bypass enabled by default.
 
-[![OBS Packages Status](https://build.opensuse.org/projects/system:systemd/packages/systemd/badge.svg?type=default)](https://build.opensuse.org/project/show/system:systemd)<br/>
-[![Semaphore CI 2.0 Build Status](https://the-real-systemd.semaphoreci.com/badges/systemd/branches/main.svg?style=shields)](https://the-real-systemd.semaphoreci.com/projects/systemd)<br/>
-[![Coverity Scan Status](https://scan.coverity.com/projects/350/badge.svg)](https://scan.coverity.com/projects/systemd)<br/>
-[![OSS-Fuzz Status](https://oss-fuzz-build-logs.storage.googleapis.com/badges/systemd.svg)](https://oss-fuzz-build-logs.storage.googleapis.com/index.html#systemd)<br/>
-[![CIFuzz](https://github.com/systemd/systemd/actions/workflows/cifuzz.yml/badge.svg)](https://github.com/systemd/systemd/actions/workflows/cifuzz.yml)</br>
-[![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/1369/badge)](https://bestpractices.coreinfrastructure.org/projects/1369)<br/>
-[![Fossies codespell report](https://fossies.org/linux/test/systemd-main.tar.gz/codespell.svg)](https://fossies.org/linux/test/systemd-main.tar.gz/codespell.html)</br>
-[![Translation status](https://translate.fedoraproject.org/widget/systemd/svg-badge.svg)](https://translate.fedoraproject.org/engage/systemd/)</br>
-[![Coverage Status](https://coveralls.io/repos/github/systemd/systemd/badge.svg?branch=main)](https://coveralls.io/github/systemd/systemd?branch=main)</br>
-[![Packaging status](https://repology.org/badge/tiny-repos/systemd.svg)](https://repology.org/project/systemd/versions)</br>
-[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/systemd/systemd/badge)](https://securityscorecards.dev/viewer/?platform=github.com&org=systemd&repo=systemd)
+## What this is
 
-## Details
+systemd PR #40954 merged a `birthDate` field into userdb user records
+to support OS-level age verification, coordinated with
+freedesktop.org MR #113 and xdg-desktop-portal PR #1922. It was
+merged without a security audit, without rate limiting, and without
+an administrator opt-out.
 
-Most documentation is available on [systemd's web site](https://systemd.io/).
+This fork fixes that. Then turns it off by default.
 
-Assorted, older, general information about systemd can be found in the [systemd Wiki](https://www.freedesktop.org/wiki/Software/systemd).
+## What we changed
 
-Information about build requirements is provided in the [README file](README).
+- `bypassAgeVerification` — admin-controlled boolean that suppresses
+  `birthDate` from being returned to callers. **Enabled by default.**
+  You can turn it off if you want to. We won't stop you.
 
-Consult our [NEWS file](NEWS) for information about what's new in the most recent systemd versions.
+- `ageVerificationPollIntervalUSec` — caps how frequently any process
+  can query age data via userdb. Defaults to 1 query per second.
+  Prevents timing oracle attacks and DoS against a field containing
+  personally identifiable information.
 
-Please see the [Code Map](docs/ARCHITECTURE.md) for information about this repository's layout and content.
+- Security hardening of Dylan's original `birthDate` implementation:
+  input validation, information exposure fixes, buffer handling
+  review, null dereference checks, and authorization documentation.
 
-Please see the [Hacking guide](docs/HACKING.md) for information on how to hack on systemd and test your modifications.
+## The legal argument
 
-Please see our [Contribution Guidelines](docs/CONTRIBUTING.md) for more information about filing GitHub Issues and posting GitHub Pull Requests.
+Every age verification law we are aware of requires that the
+mechanism be **implemented**, not that it be **active**. The code is
+here. It works. It is simply off by default. Distributions that need
+to comply with California AB 2273 or similar legislation can enable
+it via the admin flag. Everyone else gets privacy by default.
 
-When preparing patches for systemd, please follow our [Coding Style Guidelines](docs/CODING_STYLE.md).
+We did Dylan M Taylor's job better than he did, and then we turned it off.
 
-If you are looking for support, please contact our [mailing list](https://lists.freedesktop.org/mailman/listinfo/systemd-devel), join our [IRC channel #systemd on libera.chat](https://web.libera.chat/#systemd) or [Matrix channel](https://matrix.to/#/#systemd-project:matrix.org)
+## What upstream did
 
-Stable branches with backported patches are available in the [stable repo](https://github.com/systemd/systemd-stable).
+- PR #40954: merged without audit, no rate limiting, no opt-out
+- PR #41259 (our fix): renamed "spam" and locked in under a minute
+  by the same maintainer who pushed the original, with no technical
+  response
+- Freedesktop MR #113: still open, still being pushed
 
-We have a security bug bounty program sponsored by the [Sovereign Tech Fund](https://www.sovereigntechfund.de/) hosted on [YesWeHack](https://yeswehack.com/programs/systemd-bug-bounty-program)
+The locked PR is public record. The technical argument stands on its
+own.
 
-Repositories with distribution packages built from git main are [available on OBS](https://software.opensuse.org//download.html?project=system%3Asystemd&package=systemd),
-and also repositories with [packages built from the latest stable release](https://software.opensuse.org//download.html?project=system%3Asystemd%3Astable&package=systemd)
+## Related projects
+
+- [ageverificationbypass](https://github.com/HaplessIdiot/ageverificationbypass)
+  — D-Bus bypass tool for the xdg-desktop-portal age verification
+  interface. The maintainer confirmed they cannot stop users or
+  distributions from using it.
+
+- [supersonic-xserver](https://github.com/supersonic-xserver)
+  — historical XFree86 preservation and modern Linux desktop work
+
+## Building
+
+Standard systemd build:
+```bash
+meson setup build
+ninja -C build
+```
+
+No new build dependencies. No new configure flags required.
+bypassAgeVerification defaults to true in new user records.
+
+## License
+
+LGPL-2.1-or-later, same as upstream systemd.
+See LICENSES/ and individual file headers for details.
+Modifications by HaplessIdiot are licensed under the same terms.
