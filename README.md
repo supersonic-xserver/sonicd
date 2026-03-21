@@ -43,7 +43,7 @@ We did Dylan M Taylor's job better than he did, and then we turned it off.
 - PR #41259 (our fix): renamed "spam" and locked in under a minute
   by the same maintainer who pushed the original, with no technical
   response
-- Freedesktop MR #113: still open, still being pushed
+- Freedesktop MR #113: closed but still being pushed
 
 The locked PR is public record. The technical argument stands on its
 own.
