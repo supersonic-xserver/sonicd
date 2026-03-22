@@ -20,7 +20,7 @@ Every age verification law we are aware of requires that the mechanism be implem
 
 ## Upstream
 
-sonicd is a fork of systemd. The upstream repository is https://github.com/systemd/systemd. To compare all changes made in this fork against upstream:
+sonicd is a fork of systemd. The upstream repository is https://github.com/systemd/systemd. To compare all changes made in this fork against upstream since people are overly reliant on the GitHub UI for this:
 
   git clone https://github.com/supersonic-xserver/sonicd
   cd sonicd
@@ -31,12 +31,6 @@ sonicd is a fork of systemd. The upstream repository is https://github.com/syste
 Or view the diff directly:
 
   git diff upstream/main main -- src/shared/user-record.c src/shared/user-record.h src/userdb/userwork.c
-
-## Changes from upstream systemd
-
-- src/shared/user-record.h: added bypass_age_verification bool field to UserRecord struct with documentation comments
-- src/shared/user-record.c: added JSON dispatch for bypassAgeVerification in user_dispatch_table and per_machine_dispatch_table, added DEFAULT_BYPASS_AGE_VERIFICATION constant (true), added accessor function user_record_bypass_age_verification(), initialized field to true in user_record_new()
-- src/userdb/userwork.c: added bypass enforcement — when bypass_age_verification is true, birth_date is set to BIRTH_DATE_UNSET before record serialization
 
 ## What upstream did with the proposed fix
 
@@ -54,6 +48,24 @@ supersonic-xserver — historical XFree86 preservation and modern Linux desktop 
   ninja -C build
 
 No new build dependencies. No new configure flags required. bypassAgeVerification defaults to true in new user records.
+
+## Tools
+
+  `tools/sonicd-age-toggle.sh` — shell script to toggle bypassAgeVerification on a user record and optionally invoke the D-Bus bypass layer. Integrates with https://github.com/HaplessIdiot/ageverificationbypass.
+
+    # show current state
+    ./tools/sonicd-age-toggle.sh status
+
+    # enable bypass (default, birthDate hidden)
+    sudo ./tools/sonicd-age-toggle.sh on
+
+    # temporarily expose a spoofed 1970-01-01 date to satisfy a service
+    sudo ./tools/sonicd-age-toggle.sh spoof
+
+    # restore bypass when done
+    sudo ./tools/sonicd-age-toggle.sh restore
+
+  Set AVB_SCRIPT=/path/to/bypassageverification.py to point at your local copy of the D-Bus bypass script.
 
 ## License
 
