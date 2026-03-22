@@ -33,6 +33,8 @@ Or view the diff directly:
 
   git diff upstream/main main -- src/shared/user-record.c src/shared/user-record.h src/userdb/userwork.c
 
+or with the web browser... https://github.com/systemd/systemd/compare/main...supersonic-xserver:sonicd:main
+
 ## What upstream did with the proposed fix
 
 PR #41259 submitted to systemd upstream adding these changes. Renamed "spam" and locked in under a minute by the same maintainer who merged the original PR, with no technical response.
