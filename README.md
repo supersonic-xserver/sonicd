@@ -54,7 +54,7 @@ No new build dependencies. No new configure flags required. bypassAgeVerificatio
 
 ## Tools
 
-  `tools/sonicd-age-toggle.sh` — shell script to toggle bypassAgeVerification on a user record and optionally invoke the D-Bus bypass layer. Integrates with https://github.com/HaplessIdiot/ageverificationbypass.
+ `tools/sonicd-age-toggle.sh` — shell script to toggle bypassAgeVerification on a user record and optionally invoke the D-Bus bypass layer. Integrates with sonicd
 
     # show current state
     ./tools/sonicd-age-toggle.sh status
@@ -62,14 +62,10 @@ No new build dependencies. No new configure flags required. bypassAgeVerificatio
     # enable bypass (default, birthDate hidden)
     sudo ./tools/sonicd-age-toggle.sh on
 
-    # temporarily expose a spoofed 1970-01-01 date to satisfy a service
+    # temporarily expose a random adult birthdate to satisfy a service
     sudo ./tools/sonicd-age-toggle.sh spoof
 
     # restore bypass when done
     sudo ./tools/sonicd-age-toggle.sh restore
 
   Set AVB_SCRIPT=/path/to/bypassageverification.py to point at your local copy of the D-Bus bypass script.
-
-## License
-
-LGPL-2.1-or-later, same as upstream systemd. See LICENSES/ and individual file headers for details. Modifications are licensed under the same terms.
