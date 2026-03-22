@@ -29,7 +29,6 @@
 
 #define DEFAULT_RATELIMIT_BURST 30
 #define DEFAULT_RATELIMIT_INTERVAL_USEC (1*USEC_PER_MINUTE)
-#define DEFAULT_AGE_VERIFICATION_POLL_INTERVAL_USEC (1*USEC_PER_SEC)
 #define DEFAULT_BYPASS_AGE_VERIFICATION true
 
 UserRecord* user_record_new(void) {
@@ -102,7 +101,6 @@ UserRecord* user_record_new(void) {
                 .rebalance_weight = REBALANCE_WEIGHT_UNSET,
                 .tmp_limit = TMPFS_LIMIT_NULL,
                 .dev_shm_limit = TMPFS_LIMIT_NULL,
-                .age_verification_poll_interval_usec = UINT64_MAX,
                 .bypass_age_verification = DEFAULT_BYPASS_AGE_VERIFICATION,
         };
 
@@ -1626,8 +1624,6 @@ int user_record_load(UserRecord *h, sd_json_variant *v, UserRecordLoadFlags load
                 { "birthDate",                  SD_JSON_VARIANT_STRING,        json_dispatch_birth_date,             offsetof(UserRecord, birth_date),                    0              },
                 /* Admin-only: excluded from selfModifiableFields */
                 { "bypassAgeVerification",       SD_JSON_VARIANT_BOOLEAN,       sd_json_dispatch_stdbool,            offsetof(UserRecord, bypass_age_verification),       0              },
-                /* Admin-only: excluded from selfModifiableFields */
-                { "ageVerificationPollIntervalUSec", _SD_JSON_VARIANT_TYPE_INVALID, sd_json_dispatch_uint64,         offsetof(UserRecord, age_verification_poll_interval_usec), 0        },
                 { "disposition",                SD_JSON_VARIANT_STRING,        json_dispatch_user_disposition,       offsetof(UserRecord, disposition),                   0              },
                 { "lastChangeUSec",             _SD_JSON_VARIANT_TYPE_INVALID, sd_json_dispatch_uint64,              offsetof(UserRecord, last_change_usec),              0              },
                 { "lastPasswordChangeUSec",     _SD_JSON_VARIANT_TYPE_INVALID, sd_json_dispatch_uint64,              offsetof(UserRecord, last_password_change_usec),     0              },
@@ -2133,13 +2129,6 @@ bool user_record_bypass_age_verification(UserRecord *h) {
         return h->bypass_age_verification;
 }
 
-uint64_t user_record_age_verification_poll_interval_usec(UserRecord *h) {
-        assert(h);
-        if (h->age_verification_poll_interval_usec == UINT64_MAX)
-                return DEFAULT_AGE_VERIFICATION_POLL_INTERVAL_USEC;
-        return h->age_verification_poll_interval_usec;
-}
-
 bool user_record_can_authenticate(UserRecord *h) {
         assert(h);
 
@@ -2494,7 +2483,7 @@ int user_record_self_changes_allowed(UserRecord *current, UserRecord *incoming) 
          * means a disallowed field has been changed and thus we should
          * require administrator permission to apply the changes. */
 
-        /* Note: bypassAgeVerification and ageVerificationPollIntervalUSec are not in
+        /* Note: bypassAgeVerification is not in
          * default_fields[] in user_record_self_modifiable_fields() and thus
          * explicitly denied here. */
         r = remove_self_modifiable_json_fields(current, current, &vc);

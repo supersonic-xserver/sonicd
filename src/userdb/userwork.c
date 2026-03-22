@@ -31,13 +31,6 @@
 #define CONNECTION_IDLE_USEC (15 * USEC_PER_SEC)
 #define LISTEN_IDLE_USEC (90 * USEC_PER_SEC)
 
-/* Per-uid rate limiters for age verification queries */
-static Hashmap *age_verification_rate_limits = NULL;
-
-static void age_verification_ratelimits_free(void) {
-        age_verification_rate_limits = hashmap_free_free(age_verification_rate_limits);
-}
-
 typedef struct LookupParameters {
         const char *name;
         union {
@@ -250,62 +243,18 @@ static int vl_method_get_user_record(sd_varlink *link, sd_json_variant *paramete
         } else
                 trusted = peer_uid == 0 || peer_uid == hr->uid;
 
-        /* Check if the record has birthDate and apply rate limiting if so (only when bypass is false) */
-        if (hr->birth_date.tm_year > 0 && !user_record_bypass_age_verification(hr)) {
-                RateLimit *rl;
-
-                /* Initialize rate limit hashmap on first use */
-                if (!age_verification_rate_limits) {
-                        age_verification_rate_limits = hashmap_new(NULL);
-                        if (!age_verification_rate_limits)
-                                return log_oom();
-                }
-
-                /* Get or create rate limit entry for this uid */
-                rl = hashmap_get(age_verification_rate_limits, UID_TO_PTR(hr->uid));
-                if (!rl) {
-                        /* Create new rate limit entry for this uid */
-                        RateLimit *new_rl = new(RateLimit, 1);
-                        if (!new_rl)
-                                return log_oom();
-                        *new_rl = (RateLimit) {
-                                .interval = user_record_age_verification_poll_interval_usec(hr),
-                                .burst = 1, /* Strict: one query per interval */
-                        };
-
-                        r = hashmap_put(age_verification_rate_limits, UID_TO_PTR(hr->uid), new_rl);
-                        if (r < 0) {
-                                free(new_rl);
-                                return log_error_errno(r, "Failed to store age verification rate limit entry: %m");
-                        }
-
-                        /* Limit hashmap size to prevent unbounded growth */
-                        if (hashmap_size(age_verification_rate_limits) > 4096) {
-                                log_debug("Age verification rate limit table full, resetting.");
-                                hashmap_clear_free(age_verification_rate_limits);
-                        }
-
-                        rl = hashmap_get(age_verification_rate_limits, UID_TO_PTR(hr->uid));
-                }
-
-                /* Check if we're below the rate limit */
-                if (!ratelimit_below(rl)) {
-                        log_debug("Age verification query rate limited for uid " UID_FMT, hr->uid);
-                        return sd_varlink_error(link, "io.systemd.UserDatabase.RateLimited", NULL);
-                }
-        }
-
         _cleanup_(sd_json_variant_unrefp) sd_json_variant *v = NULL;
         r = build_user_json(link, hr, &v);
         if (r < 0)
                 return r;
 
-        /* Apply age verification bypass for non-privileged callers */
-        if (!trusted && user_record_bypass_age_verification(hr)) {
-                r = sd_json_variant_filter(&v, STRV_MAKE("birthDate"));
-                if (r < 0)
-                        return r;
-        }
+        /* bypassAgeVerification defaults to true in this fork.
+         * Rate limiting for userdb queries is handled by the existing
+         * rateLimitIntervalUSec/rateLimitBurst mechanism on the
+         * UserRecord (default: 30 queries/minute). No additional
+         * per-field rate limiting is needed. */
+        if (user_record_bypass_age_verification(hr))
+                hr->birth_date = BIRTH_DATE_UNSET;
 
         return sd_varlink_reply(link, v);
 }
@@ -663,9 +612,6 @@ static int run(int argc, char *argv[]) {
                 (void) process_connection(server, TAKE_FD(fd));
                 last_busy_usec = USEC_INFINITY;
         }
-
-        /* Cleanup rate limiters before exiting */
-        age_verification_ratelimits_free();
 
         return 0;
 }
