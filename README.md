@@ -46,10 +46,10 @@ ageverificationbypass — D-Bus bypass tool for the xdg-desktop-portal age verif
 supersonic-xserver — historical XFree86 preservation and modern Linux desktop work: https://github.com/supersonic-xserver
 
 ## Building
-
+```
   meson setup build
   ninja -C build
-
+```
 No new build dependencies. No new configure flags required. bypassAgeVerification defaults to true in new user records.
 
 ## Tools
