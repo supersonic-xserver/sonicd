@@ -10,7 +10,7 @@ This fork adds a `bypassAgeVerification` field that defaults to true, meaning bi
 
 ## What we changed
 
-`bypassAgeVerification` — admin-controlled boolean added to UserRecord. When true, birth_date is set to BIRTH_DATE_UNSET before serialization, producing the same result as a record with no birthDate set. Defaults to true. Distributions that need to comply with age verification legislation can set it to false via homectl. Excluded from selfModifiableFields — admin-only.
+`bypassAgeVerification` — admin-controlled boolean added to UserRecord. When true, birth_date is set to BIRTH_DATE_UNSET before serialization, producing the same result as a record with no birthDate set. Defaults to true. Distributions that need to comply with age verification legislation can set it to false via homectl. Excluded from selfModifiableFields it is admin-only.
 
 Security hardening of the original birthDate implementation: input validation, information exposure review, null dereference checks, buffer handling review, and authorization documentation.
 
