@@ -22,12 +22,13 @@ Every age verification law we are aware of requires that the mechanism be implem
 
 sonicd is a fork of systemd. The upstream repository is https://github.com/systemd/systemd. To compare all changes made in this fork against upstream since people are overly reliant on the GitHub UI for this:
 
+  ```
   git clone https://github.com/supersonic-xserver/sonicd
   cd sonicd
   git remote add upstream https://github.com/systemd/systemd
   git fetch upstream
   git log upstream/main..main --oneline
-
+  ```
 Or view the diff directly:
 
   git diff upstream/main main -- src/shared/user-record.c src/shared/user-record.h src/userdb/userwork.c
