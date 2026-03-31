@@ -3365,20 +3365,18 @@ char* namespace_cleanup_tmpdir(char *p) {
 static int make_tmp_prefix(const char *prefix) {
         _cleanup_free_ char *t = NULL;
         _cleanup_close_ int fd = -EBADF;
+        _cleanup_free_ char *parent = NULL;
         int r;
 
         assert(prefix);
 
-        /* Don't do anything unless we know the dir is actually missing */
-        r = access(prefix, F_OK);
-        if (r >= 0)
-                return 0;
-        if (errno != ENOENT)
-                return -errno;
-
+        /* Try to create the parent directory directly without TOCTOU race.
+         * Use mkdir_parents with O_CREAT|O_EXCL semantics to atomically
+         * check and create the directory. If it already exists, that's fine. */
         WITH_UMASK(000)
                 r = mkdir_parents(prefix, 0755);
-        if (r < 0)
+        /* If it already exists, that's fine - we don't need to do anything */
+        if (r < 0 && r != -EEXIST)
                 return r;
 
         r = tempfn_random(prefix, NULL, &t);

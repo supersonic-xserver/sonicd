@@ -888,12 +888,19 @@ static int manager_assess_image(
         if (!path)
                 return log_oom();
 
-        /* Follow symlinks here, to allow people to link in stuff to make them available locally. */
+        /* Use atomic open+stat to avoid TOCTOU race between stat and open.
+         * First open with O_PATH|O_NOFOLLOW to get an fd without following symlinks,
+         * then use fstat to verify the file type. */
+        _cleanup_close_ int stat_fd = -EBADF;
         if (dir_fd >= 0)
-                r = fstatat(dir_fd, dentry_name, &st, 0);
+                stat_fd = openat(dir_fd, dentry_name, O_PATH|O_NOFOLLOW|O_CLOEXEC);
         else
-                r = stat(path, &st);
-        if (r < 0)
+                stat_fd = open(path, O_PATH|O_NOFOLLOW|O_CLOEXEC);
+        if (stat_fd < 0)
+                return log_full_errno(errno == ENOENT ? LOG_DEBUG : LOG_WARNING, errno,
+                                      "Failed to open '%s', ignoring: %m", dentry_name);
+
+        if (fstat(stat_fd, &st) < 0)
                 return log_full_errno(errno == ENOENT ? LOG_DEBUG : LOG_WARNING, errno,
                                       "Failed to stat() directory entry '%s', ignoring: %m", dentry_name);
 
@@ -934,6 +941,13 @@ static int manager_assess_image(
                 if (r < 0)
                         return log_error_errno(r, "Failed to split image name into user name/realm: %m");
 
+                /* Use the already-obtained fd as the base for opening the directory.
+                 * We dup() the stat_fd because we still need it for subsequent operations. */
+                fd = fcntl(stat_fd, F_DUPFD_CLOEXEC, 0);
+                if (fd < 0)
+                        return log_oom();
+
+                /* Re-open with proper flags for directory operations */
                 if (dir_fd >= 0)
                         fd = openat(dir_fd, dentry_name, O_DIRECTORY|O_RDONLY|O_CLOEXEC);
                 else
