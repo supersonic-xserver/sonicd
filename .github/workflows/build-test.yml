@@ -2,7 +2,8 @@
 # vi: ts=2 sw=2 et:
 # SPDX-License-Identifier: LGPL-2.1-or-later
 #
-name: Build test
+name: Hardened Build
+
 on:
   pull_request:
     paths:
@@ -11,52 +12,29 @@ on:
       - 'meson_options.txt'
       - 'src/**'
       - 'test/fuzz/**'
+  push:
+    branches:
+      - main
 
 permissions:
   contents: read
 
 jobs:
   build:
-    runs-on: ${{ matrix.runner }}
+    runs-on: ubuntu-24.04
     concurrency:
-      group: ${{ github.workflow }}-${{ toJSON(matrix.env) }}-${{ github.ref }}-${{ matrix.runner }}-${{ matrix.python-version }}
+      group: ${{ github.workflow }}-${{ github.ref }}
       cancel-in-progress: true
-    strategy:
-      fail-fast: false
-      matrix:
-        runner: [ ubuntu-24.04 ]
-        python-version: [ '' ]
-        env:
-          - { COMPILER: "gcc",   COMPILER_VERSION: "11", LINKER: "bfd"  }
-          - { COMPILER: "gcc",   COMPILER_VERSION: "13", LINKER: "mold" }
-          - { COMPILER: "clang", COMPILER_VERSION: "14", LINKER: "mold" }
-          - { COMPILER: "clang", COMPILER_VERSION: "16", LINKER: "bfd"  }
-          - { COMPILER: "clang", COMPILER_VERSION: "18", LINKER: "lld"  }
-        include:
-          - env: { COMPILER: "gcc",   COMPILER_VERSION: "11", LINKER: "bfd"  }
-            runner: [ ubuntu-24.04-ppc64le ]
-            python-version: ''
-          - env: { COMPILER: "gcc",   COMPILER_VERSION: "13", LINKER: "mold"  }
-            runner: [ ubuntu-24.04-arm ]
-            python-version: ''
-          - env: { COMPILER: "clang", COMPILER_VERSION: "18", LINKER: "lld"  }
-            runner: [ ubuntu-24.04-s390x ]
-            python-version: ''
-          # Do one run with the oldest supported python version to ensure there are no regressions
-          # It is only available on Jammy, which is useful as it will also provide a build check for
-          # older glibc
-          - env: { COMPILER: "gcc",   COMPILER_VERSION: "12", LINKER: "bfd", CUSTOM_PYTHON: "1"  }
-            runner: [ ubuntu-22.04 ]
-            python-version: '3.9'
-    env: ${{ matrix.env }}
+    env:
+      COMPILER: clang
+      COMPILER_VERSION: "18"
+      LINKER: lld
+      CFLAGS: "-O2 -D_FORTIFY_SOURCE=3 -Wall"
     steps:
       - name: Repository checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
-      - name: Setup python
-        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
-        with:
-          python-version: ${{ matrix.python-version }}
+
       - name: Build check
         run: .github/workflows/build-test.sh

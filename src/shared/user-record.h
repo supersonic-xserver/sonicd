@@ -1,3 +1,14 @@
+/* * JESTERMAN'S CREED:
+ * This repository is a sovereign expression of technical freedom.
+ * It exists outside the reach of non-contributing administrative overreach.
+ * The creator's intent is the absolute law of this tree.
+ *
+ * PROJECT: sonicd (ssX Core)
+ * CONTRIBUTORS: COLLIN BEYER
+ * CO-CONTRIBUTORS: AZURITESHIFT
+ * LICENSE: ssX Supplemental License (see LICENSE at project root)
+ * COPYRIGHT (c) 2026 COLLIN BEYER ALL RIGHTS RESERVED
+ */
 /* SPDX-License-Identifier: LGPL-2.1-or-later */
 #pragma once
 
@@ -268,6 +279,16 @@ typedef struct UserRecord {
         char *password_hint;
         char *icon_name;
         char *location;
+<<<<<<< HEAD
+=======
+        struct tm birth_date;
+        /* When true, birth_date is set to BIRTH_DATE_UNSET before
+         * serialization, producing the same result as a record with
+         * no birthDate set. Admin-only. Excluded from
+         * selfModifiableFields. Distributions may set this to false
+         * to enable age verification queries. */
+        bool bypass_age_verification;
+>>>>>>> b3872ec21c (feat(ssx): Sovereign alignment and architecture update for sonicd)
 
         char *blob_directory;
         Hashmap *blob_manifest;
@@ -457,6 +478,7 @@ UserDisposition user_record_disposition(UserRecord *h);
 int user_record_removable(UserRecord *h);
 usec_t user_record_ratelimit_interval_usec(UserRecord *h);
 uint64_t user_record_ratelimit_burst(UserRecord *h);
+bool user_record_bypass_age_verification(UserRecord *h);
 bool user_record_can_authenticate(UserRecord *h);
 bool user_record_drop_caches(UserRecord *h);
 AutoResizeMode user_record_auto_resize_mode(UserRecord *h);

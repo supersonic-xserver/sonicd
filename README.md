@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Liberated `systemd`
 
 Mass surveillance is bad, actually. So here's a fork of `systemd` with surveillance enablement removed, which will be kept up-to-date with other changes in `systemd/main`. However you use this, or do not, is your choice and yours alone.
@@ -41,44 +42,114 @@ The original `systemd` readme is included below for reference.
 ---
 
 ![Systemd](http://brand.systemd.io/assets/page-logo.png)
+=======
+# sonicd
+>>>>>>> b3872ec21c (feat(ssx): Sovereign alignment and architecture update for sonicd)
 
-System and Service Manager
+A fork of systemd with age verification bypass enabled by default.
 
-[![OBS Packages Status](https://build.opensuse.org/projects/system:systemd/packages/systemd/badge.svg?type=default)](https://build.opensuse.org/project/show/system:systemd)<br/>
-[![Semaphore CI 2.0 Build Status](https://the-real-systemd.semaphoreci.com/badges/systemd/branches/main.svg?style=shields)](https://the-real-systemd.semaphoreci.com/projects/systemd)<br/>
-[![Coverity Scan Status](https://scan.coverity.com/projects/350/badge.svg)](https://scan.coverity.com/projects/systemd)<br/>
-[![OSS-Fuzz Status](https://oss-fuzz-build-logs.storage.googleapis.com/badges/systemd.svg)](https://oss-fuzz-build-logs.storage.googleapis.com/index.html#systemd)<br/>
-[![CIFuzz](https://github.com/systemd/systemd/actions/workflows/cifuzz.yml/badge.svg)](https://github.com/systemd/systemd/actions/workflows/cifuzz.yml)</br>
-[![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/1369/badge)](https://bestpractices.coreinfrastructure.org/projects/1369)<br/>
-[![Fossies codespell report](https://fossies.org/linux/test/systemd-main.tar.gz/codespell.svg)](https://fossies.org/linux/test/systemd-main.tar.gz/codespell.html)</br>
-[![Translation status](https://translate.fedoraproject.org/widget/systemd/svg-badge.svg)](https://translate.fedoraproject.org/engage/systemd/)</br>
-[![Coverage Status](https://coveralls.io/repos/github/systemd/systemd/badge.svg?branch=main)](https://coveralls.io/github/systemd/systemd?branch=main)</br>
-[![Packaging status](https://repology.org/badge/tiny-repos/systemd.svg)](https://repology.org/project/systemd/versions)</br>
-[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/systemd/systemd/badge)](https://securityscorecards.dev/viewer/?platform=github.com&org=systemd&repo=systemd)
+## What this is
 
-## Details
+systemd PR #40954 merged a `birthDate` field into userdb user records to support OS-level age verification, coordinated with freedesktop.org MR #113 and xdg-desktop-portal PR #1922. It was merged without a security audit and without an administrator opt-out.
 
-Most documentation is available on [systemd's web site](https://systemd.io/).
+This fork adds a `bypassAgeVerification` field that defaults to true, meaning birthDate is never exposed to callers unless an administrator explicitly sets it to false. The existing systemd rate limiting (30 queries/minute via rateLimitIntervalUSec/rateLimitBurst) already handles query throttling — no additional rate limiting is needed.
 
-Assorted, older, general information about systemd can be found in the [systemd Wiki](https://www.freedesktop.org/wiki/Software/systemd).
+## What we changed
 
-Information about build requirements is provided in the [README file](README).
+`bypassAgeVerification` — admin-controlled boolean added to UserRecord. When true, birth_date is set to BIRTH_DATE_UNSET before serialization, producing the same result as a record with no birthDate set. Defaults to true. Distributions that need to comply with age verification legislation can set it to false via homectl. Excluded from selfModifiableFields it is admin-only.
 
-Consult our [NEWS file](NEWS) for information about what's new in the most recent systemd versions.
+Security hardening of the original birthDate implementation: input validation, information exposure review, null dereference checks, buffer handling review, and authorization documentation.
 
-Please see the [Code Map](docs/ARCHITECTURE.md) for information about this repository's layout and content.
+## The legal argument
 
-Please see the [Hacking guide](docs/HACKING.md) for information on how to hack on systemd and test your modifications.
+Every age verification law we are aware of requires that the mechanism be implemented, not that it be active. The code is here. It works. It is simply off by default. Distributions that need California AB 2273 or similar compliance can enable it via the admin flag. Everyone else gets privacy by default.
 
-Please see our [Contribution Guidelines](docs/CONTRIBUTING.md) for more information about filing GitHub Issues and posting GitHub Pull Requests.
+## Upstream
 
-When preparing patches for systemd, please follow our [Coding Style Guidelines](docs/CODING_STYLE.md).
+sonicd is a fork of systemd. The upstream repository is https://github.com/systemd/systemd. To compare all changes made in this fork against upstream since people are overly reliant on the GitHub UI for this:
 
-If you are looking for support, please contact our [mailing list](https://lists.freedesktop.org/mailman/listinfo/systemd-devel), join our [IRC channel #systemd on libera.chat](https://web.libera.chat/#systemd) or [Matrix channel](https://matrix.to/#/#systemd-project:matrix.org)
+  ```
+  git clone https://github.com/supersonic-xserver/sonicd
+  cd sonicd
+  git remote add upstream https://github.com/systemd/systemd
+  git fetch upstream
+  git log upstream/main..main --oneline
+  ```
+Or view the diff directly:
 
-Stable branches with backported patches are available in the [stable repo](https://github.com/systemd/systemd-stable).
+  git diff upstream/main main -- src/shared/user-record.c src/shared/user-record.h src/userdb/userwork.c
 
-We have a security bug bounty program sponsored by the [Sovereign Tech Fund](https://www.sovereigntechfund.de/) hosted on [YesWeHack](https://yeswehack.com/programs/systemd-bug-bounty-program)
+or with the web browser... https://github.com/systemd/systemd/compare/main...supersonic-xserver:sonicd:main
 
-Repositories with distribution packages built from git main are [available on OBS](https://software.opensuse.org//download.html?project=system%3Asystemd&package=systemd),
-and also repositories with [packages built from the latest stable release](https://software.opensuse.org//download.html?project=system%3Asystemd%3Astable&package=systemd)
+## What upstream did with the proposed fix
+
+PR #41259 submitted to systemd upstream adding these changes. Renamed "spam" and locked in under a minute by the same maintainer who merged the original PR, with no technical response.
+
+## Related projects
+
+ageverificationbypass — D-Bus bypass tool for the xdg-desktop-portal age verification interface: https://github.com/HaplessIdiot/ageverificationbypass
+
+supersonic-xserver — historical XFree86 preservation and modern Linux desktop work: https://github.com/supersonic-xserver
+
+## Building
+```
+  meson setup build
+  ninja -C build
+```
+No new build dependencies. No new configure flags required. bypassAgeVerification defaults to true in new user records.
+
+## ageD Null-Attestation Interface
+
+This fork includes a complete ageD (Age Attestation) interface implementation in `src/aged/` that provides the org.freedesktop.AgeVerification D-Bus service with standard-compliant responses without implementing actual verification logic.
+
+### The MidnightBSD Problem
+
+MidnightBSD 4.0.4 introduced mandatory age verification requirements for user accounts, coupling the OS to the ageD specification. This created a significant problem for distributions and users:
+
+1. **Specification Lock-in**: The ageD spec requires an active D-Bus service at org.freedesktop.AgeVerification
+2. **No Opt-out**: Applications legitimately expecting age verification will fail without the interface
+3. **CVE Surface**: Upstream systemd-homed implementations carry significant attack surface (token management, cryptographic operations, user data handling)
+
+### Our Solution
+
+Rather than removing ageD support entirely (which would break compatibility), we provide a null-attestation implementation:
+
+- `src/aged/aged_bypass` — D-Bus service that returns "adult" / "verified" for all queries
+- `src/aged/agectl` — CLI tool for status and control
+
+This satisfies:
+- Application compatibility (they see the expected D-Bus interface)
+- User privacy (no actual verification performed)
+- Zero CVE surface (no cryptographic code, no user data handling)
+
+### MidnightBSD 4.0.4 Context
+
+The MidnightBSD 4.0.4 release tied age verification to the base system in a way that makes removal difficult:
+- PAM modules expect the D-Bus interface
+- Desktop environments query org.freedesktop.AgeVerification
+- System services may refuse to operate without attestation
+
+The only way to satisfy these requirements without implementing actual verification (and exposing user birth dates) is the null-attestation pattern we've implemented. This is not a hack — it's the specified behavior for systems that don't require age verification but need interface compatibility.
+
+## Tools
+
+ `tools/sonicd-age-toggle.sh` — shell script to toggle bypassAgeVerification on a user record and optionally invoke the D-Bus bypass layer. Integrates with sonicd
+
+    # show current state
+    ./tools/sonicd-age-toggle.sh status
+
+    # Enable Standard Response Protocol (bypass mode)
+    sudo ./tools/sonicd-age-toggle.sh on
+
+    # Enable Native OS mode (for compliance testing)
+    sudo ./tools/sonicd-age-toggle.sh off
+
+    # temporarily expose a random adult birthdate to satisfy a service
+    sudo ./tools/sonicd-age-toggle.sh spoof
+
+    # restore bypass when done
+    sudo ./tools/sonicd-age-toggle.sh restore
+
+  Set AVB_SCRIPT=/path/to/bypassageverification.py to point at your local copy of the D-Bus bypass script.
+
+  Features include immutable (+i) attribute protection, service management, D-Bus verification, and state persistence.

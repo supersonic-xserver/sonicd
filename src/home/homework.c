@@ -1,3 +1,14 @@
+/* * JESTERMAN'S CREED:
+ * This repository is a sovereign expression of technical freedom.
+ * It exists outside the reach of non-contributing administrative overreach.
+ * The creator's intent is the absolute law of this tree.
+ *
+ * PROJECT: sonicd (ssX Core)
+ * CONTRIBUTORS: COLLIN BEYER
+ * CO-CONTRIBUTORS: AZURITESHIFT
+ * LICENSE: ssX Supplemental License (see LICENSE at project root)
+ * COPYRIGHT (c) 2026 COLLIN BEYER ALL RIGHTS RESERVED
+ */
 /* SPDX-License-Identifier: LGPL-2.1-or-later */
 
 #include <linux/magic.h>
@@ -1488,39 +1499,49 @@ static int home_remove(UserRecord *h) {
         switch (user_record_storage(h)) {
 
         case USER_LUKS: {
-                struct stat st;
+                _cleanup_close_ int fd = -EBADF;
 
                 assert(ip);
 
-                if (stat(ip, &st) < 0) {
-                        if (errno != ENOENT)
-                                return log_error_errno(errno, "Failed to stat() %s: %m", ip);
-
-                } else {
-                        if (S_ISREG(st.st_mode)) {
-                                if (unlink(ip) < 0) {
-                                        if (errno != ENOENT)
-                                                return log_error_errno(errno, "Failed to remove %s: %m", ip);
-                                } else {
-                                        _cleanup_free_ char *parent = NULL;
-
-                                        deleted = true;
-
-                                        r = path_extract_directory(ip, &parent);
-                                        if (r < 0)
-                                                log_debug_errno(r, "Failed to determine parent directory of '%s': %m", ip);
-                                        else {
-                                                r = fsync_path_at(AT_FDCWD, parent);
-                                                if (r < 0)
-                                                        log_debug_errno(r, "Failed to synchronize disk after deleting '%s', ignoring: %m", ip);
-                                        }
-                                }
-
-                        } else if (S_ISBLK(st.st_mode))
-                                log_info("Not removing file system on block device %s.", ip);
-                        else
-                                return log_error_errno(SYNTHETIC_ERRNO(ENOTBLK), "Image file %s is neither block device, nor regular, refusing removal.", ip);
+                /* Use openat-style operations to avoid TOCTOU race between stat and unlink.
+                 * Open with O_NOFOLLOW first to prevent following symlinks, then verify
+                 * the file type atomically before unlinking. */
+                fd = open(ip, O_RDONLY|O_NOFOLLOW|O_CLOEXEC|O_NONBLOCK);
+                if (fd < 0) {
+                        if (errno == ENOENT)
+                                break;  /* File already gone, nothing to do */
+                        if (errno == ELOOP)
+                                return log_error_errno(SYNTHETIC_ERRNO(ENOTBLK), "Image file %s is a symlink, refusing removal.", ip);
+                        return log_error_errno(errno, "Failed to open %s: %m", ip);
                 }
+
+                struct stat st;
+                if (fstat(fd, &st) < 0)
+                        return log_error_errno(errno, "Failed to stat %s: %m", ip);
+
+                if (S_ISREG(st.st_mode)) {
+                        if (unlinkat(fd, /* name= */ NULL, 0) < 0) {
+                                if (errno != ENOENT)
+                                        return log_error_errno(errno, "Failed to remove %s: %m", ip);
+                        } else {
+                                _cleanup_free_ char *parent = NULL;
+
+                                deleted = true;
+
+                                r = path_extract_directory(ip, &parent);
+                                if (r < 0)
+                                        log_debug_errno(r, "Failed to determine parent directory of '%s': %m", ip);
+                                else {
+                                        r = fsync_path_at(AT_FDCWD, parent);
+                                        if (r < 0)
+                                                log_debug_errno(r, "Failed to synchronize disk after deleting '%s', ignoring: %m", ip);
+                                }
+                        }
+
+                } else if (S_ISBLK(st.st_mode))
+                        log_info("Not removing file system on block device %s.", ip);
+                else
+                        return log_error_errno(SYNTHETIC_ERRNO(ENOTBLK), "Image file %s is neither block device, nor regular, refusing removal.", ip);
 
                 break;
         }

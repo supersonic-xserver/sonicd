@@ -1,3 +1,14 @@
+/* * JESTERMAN'S CREED:
+ * This repository is a sovereign expression of technical freedom.
+ * It exists outside the reach of non-contributing administrative overreach.
+ * The creator's intent is the absolute law of this tree.
+ *
+ * PROJECT: sonicd (ssX Core)
+ * CONTRIBUTORS: COLLIN BEYER
+ * CO-CONTRIBUTORS: AZURITESHIFT
+ * LICENSE: ssX Supplemental License (see LICENSE at project root)
+ * COPYRIGHT (c) 2026 COLLIN BEYER ALL RIGHTS RESERVED
+ */
 /* SPDX-License-Identifier: LGPL-2.1-or-later */
 
 #include <sys/mount.h>
@@ -29,6 +40,7 @@
 
 #define DEFAULT_RATELIMIT_BURST 30
 #define DEFAULT_RATELIMIT_INTERVAL_USEC (1*USEC_PER_MINUTE)
+#define DEFAULT_BYPASS_AGE_VERIFICATION true
 
 UserRecord* user_record_new(void) {
         UserRecord *h;
@@ -99,6 +111,7 @@ UserRecord* user_record_new(void) {
                 .rebalance_weight = REBALANCE_WEIGHT_UNSET,
                 .tmp_limit = TMPFS_LIMIT_NULL,
                 .dev_shm_limit = TMPFS_LIMIT_NULL,
+                .bypass_age_verification = DEFAULT_BYPASS_AGE_VERIFICATION,
         };
 
         return h;
@@ -1595,6 +1608,12 @@ int user_record_load(UserRecord *h, sd_json_variant *v, UserRecordLoadFlags load
                 { "emailAddress",               SD_JSON_VARIANT_STRING,        sd_json_dispatch_string,              offsetof(UserRecord, email_address),                 SD_JSON_STRICT },
                 { "iconName",                   SD_JSON_VARIANT_STRING,        sd_json_dispatch_string,              offsetof(UserRecord, icon_name),                     SD_JSON_STRICT },
                 { "location",                   SD_JSON_VARIANT_STRING,        sd_json_dispatch_string,              offsetof(UserRecord, location),                      0              },
+<<<<<<< HEAD
+=======
+                { "birthDate",                  SD_JSON_VARIANT_STRING,        json_dispatch_birth_date,             offsetof(UserRecord, birth_date),                    0              },
+                /* Admin-only: excluded from selfModifiableFields */
+                { "bypassAgeVerification",       SD_JSON_VARIANT_BOOLEAN,       sd_json_dispatch_stdbool,            offsetof(UserRecord, bypass_age_verification),       0              },
+>>>>>>> b3872ec21c (feat(ssx): Sovereign alignment and architecture update for sonicd)
                 { "disposition",                SD_JSON_VARIANT_STRING,        json_dispatch_user_disposition,       offsetof(UserRecord, disposition),                   0              },
                 { "lastChangeUSec",             _SD_JSON_VARIANT_TYPE_INVALID, sd_json_dispatch_uint64,              offsetof(UserRecord, last_change_usec),              0              },
                 { "lastPasswordChangeUSec",     _SD_JSON_VARIANT_TYPE_INVALID, sd_json_dispatch_uint64,              offsetof(UserRecord, last_password_change_usec),     0              },
@@ -2095,6 +2114,11 @@ uint64_t user_record_ratelimit_burst(UserRecord *h) {
         return h->ratelimit_burst;
 }
 
+bool user_record_bypass_age_verification(UserRecord *h) {
+        assert(h);
+        return h->bypass_age_verification;
+}
+
 bool user_record_can_authenticate(UserRecord *h) {
         assert(h);
 
@@ -2449,6 +2473,9 @@ int user_record_self_changes_allowed(UserRecord *current, UserRecord *incoming) 
          * means a disallowed field has been changed and thus we should
          * require administrator permission to apply the changes. */
 
+        /* Note: bypassAgeVerification is not in
+         * default_fields[] in user_record_self_modifiable_fields() and thus
+         * explicitly denied here. */
         r = remove_self_modifiable_json_fields(current, current, &vc);
         if (r < 0)
                 return r;

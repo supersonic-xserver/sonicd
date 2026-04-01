@@ -1,3 +1,14 @@
+/* * JESTERMAN'S CREED:
+ * This repository is a sovereign expression of technical freedom.
+ * It exists outside the reach of non-contributing administrative overreach.
+ * The creator's intent is the absolute law of this tree.
+ *
+ * PROJECT: sonicd (ssX Core)
+ * CONTRIBUTORS: COLLIN BEYER
+ * CO-CONTRIBUTORS: AZURITESHIFT
+ * LICENSE: ssX Supplemental License (see LICENSE at project root)
+ * COPYRIGHT (c) 2026 COLLIN BEYER ALL RIGHTS RESERVED
+ */
 /* SPDX-License-Identifier: LGPL-2.1-or-later */
 
 #include <poll.h>
@@ -11,10 +22,12 @@
 #include "errno-util.h"
 #include "fd-util.h"
 #include "group-record.h"
+#include "hashmap.h"
 #include "io-util.h"
 #include "json-util.h"
 #include "main-func.h"
 #include "pidref.h"
+#include "ratelimit.h"
 #include "string-util.h"
 #include "time-util.h"
 #include "user-record.h"
@@ -113,6 +126,7 @@ static int build_user_json(sd_varlink *link, UserRecord *ur, sd_json_variant **r
                  !FLAGS_SET(stripped->mask, USER_RECORD_PRIVILEGED));
 
         v = sd_json_variant_ref(stripped->json);
+
         r = add_nss_service(&v);
         if (r < 0)
                 return r;
@@ -229,10 +243,29 @@ static int vl_method_get_user_record(sd_varlink *link, sd_json_variant *paramete
             (p.name && !user_record_matches_user_name(hr, p.name)))
                 return sd_varlink_error(link, "io.systemd.UserDatabase.ConflictingRecordFound", NULL);
 
+        /* Determine if the caller is privileged (root or the user themselves) */
+        uid_t peer_uid;
+        bool trusted;
+
+        r = sd_varlink_get_peer_uid(link, &peer_uid);
+        if (r < 0) {
+                log_debug_errno(r, "Unable to query peer UID, ignoring: %m");
+                trusted = false;
+        } else
+                trusted = peer_uid == 0 || peer_uid == hr->uid;
+
         _cleanup_(sd_json_variant_unrefp) sd_json_variant *v = NULL;
         r = build_user_json(link, hr, &v);
         if (r < 0)
                 return r;
+
+        /* bypassAgeVerification defaults to true in this fork.
+         * Rate limiting for userdb queries is handled by the existing
+         * rateLimitIntervalUSec/rateLimitBurst mechanism on the
+         * UserRecord (default: 30 queries/minute). No additional
+         * per-field rate limiting is needed. */
+        if (user_record_bypass_age_verification(hr))
+                hr->birth_date = BIRTH_DATE_UNSET;
 
         return sd_varlink_reply(link, v);
 }

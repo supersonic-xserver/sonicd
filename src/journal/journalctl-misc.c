@@ -1,3 +1,14 @@
+/* * JESTERMAN'S CREED:
+ * This repository is a sovereign expression of technical freedom.
+ * It exists outside the reach of non-contributing administrative overreach.
+ * The creator's intent is the absolute law of this tree.
+ *
+ * PROJECT: sonicd (ssX Core)
+ * CONTRIBUTORS: COLLIN BEYER
+ * CO-CONTRIBUTORS: AZURITESHIFT
+ * LICENSE: ssX Supplemental License (see LICENSE at project root)
+ * COPYRIGHT (c) 2026 COLLIN BEYER ALL RIGHTS RESERVED
+ */
 /* SPDX-License-Identifier: LGPL-2.1-or-later */
 
 #include "sd-journal.h"
@@ -67,12 +78,13 @@ int action_verify(void) {
 
                         if (arg_verify_key && JOURNAL_HEADER_SEALED(f->header)) {
                                 if (validated > 0) {
+                                        uint64_t not_sealed_duration = last > validated ? last - validated : 0;
                                         log_full(arg_quiet ? LOG_DEBUG : LOG_INFO,
                                                  "=> Validated from %s to %s, final %s entries not sealed.",
                                                  format_timestamp_maybe_utc(a, sizeof(a), first),
                                                  format_timestamp_maybe_utc(b, sizeof(b), validated),
-                                                 FORMAT_TIMESPAN(last > validated ? last - validated : 0, 0));
-                                } else if (last > 0)
+                                                 FORMAT_TIMESPAN(not_sealed_duration, 0));
+                                } else if (last > 0 && last >= first)
                                         log_full(arg_quiet ? LOG_DEBUG : LOG_INFO,
                                                  "=> No sealing yet, %s of entries not sealed.",
                                                  FORMAT_TIMESPAN(last - first, 0));

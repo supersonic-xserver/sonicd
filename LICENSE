@@ -1,0 +1,435 @@
+C
+/* * JESTERMAN'S CREED:
+ * This repository is a sovereign expression of technical freedom.
+ * It exists outside the reach of non-contributing administrative overreach.
+ * The creator's intent is the absolute law of this tree.
+ *
+ * PROJECT: sonicland (ssX Core)
+ * CONTRIBUTORS: COLLIN BEYER, AZURITESHIFT
+ * LICENSE: ssX Supplemental License (see LICENSE at project root)
+ * COPYRIGHT (c) 2026 COLLIN BEYER ALL RIGHTS RESERVED
+ */
+
+================================================================================
+                    ssX Supplemental License
+                        ("The Hire the Team" Clause)
+                            Version 1.0
+                   Effective upon inclusion in any ssX distribution
+================================================================================
+
+This Supplemental License applies to all original contributions, modifications,
+compatibility shims, build system infrastructure, and derived works authored by
+ssX project contributors and incorporated into the ssX codebase ("Covered
+Contributions"). It does not supersede the XFree86 License governing the
+underlying source; it applies in addition to it.
+
+--------------------------------------------------------------------------------
+1. GRANT OF USE
+--------------------------------------------------------------------------------
+
+Permission is granted, free of charge, to any individual, non-profit
+organization, educational institution, or open source project with annual
+gross revenue not exceeding USD $1,000,000 to use, copy, modify, merge,
+publish, distribute, and sublicense the Covered Contributions, subject to
+the conditions of the underlying XFree86 License.
+
+--------------------------------------------------------------------------------
+2. DEFINITIONS
+--------------------------------------------------------------------------------
+
+"Commercial Entity" means any corporation, LLC, partnership, or other
+for-profit legal entity with annual gross revenue exceeding USD $1,000,000,
+or any subsidiary, affiliate, successor, or acquiring entity thereof.
+Revenue thresholds are evaluated at the parent entity level; subdivision
+of a Commercial Entity into smaller legal entities for the purpose of
+falling below the threshold constitutes a violation of Section 3.
+
+"Project Contributors" means all individuals who have made commits, patches,
+documentation, tooling, or other material contributions to the ssX codebase,
+as recorded in the project's version control history. All Project Contributors
+are considered equal co-authors of the Covered Contributions regardless of
+contribution volume. A canonical list is maintained in CONTRIBUTORS at the
+repository root; version control history is authoritative in the event of dispute.
+
+"Covered Contributions" means all original work authored by any Project
+Contributor and incorporated into the ssX codebase, including but not limited
+to source code, build system definitions, compatibility shims, documentation,
+and test infrastructure.
+
+"Downstream Lockout" means any act by which a party receives the Covered
+Contributions, modifies or builds upon them, and then restricts access to
+the resulting source code through technical, legal, contractual, or
+subscription-based mechanisms — including but not limited to paywall access,
+CLA requirements, trademark enforcement, or binary-only distribution.
+
+"Governance Capture" means any coordinated effort by a Commercial Entity to
+acquire controlling influence over the ssX project's technical direction,
+contributor base, or decision-making processes through employment of
+contributors, funding dependencies, or organizational affiliation, without
+satisfying the conditions of Section 4.
+
+"Contribution Laundering" means the submission of contributions to the ssX
+codebase by employees or agents of a Commercial Entity for the purpose of
+establishing downstream usage rights, circumventing Section 3, or creating
+the appearance of open source participation while the entity simultaneously
+violates this license.
+
+--------------------------------------------------------------------------------
+3. COMMERCIAL USE RESTRICTION
+--------------------------------------------------------------------------------
+
+A Commercial Entity may not, without a separate written commercial license
+obtained under Section 4:
+
+a) Deploy, distribute, or incorporate the Covered Contributions into any
+   product or service offered for commercial gain;
+
+b) Use the Covered Contributions in internal infrastructure, tooling, or
+   pipelines that support revenue-generating activities;
+
+c) Sublicense or relicense the Covered Contributions to a third party for
+   commercial purposes;
+
+d) Employ, contract, or retain any individual Project Contributor in a
+   capacity that involves the Covered Contributions without simultaneously
+   satisfying the conditions of Section 4 with respect to all Project
+   Contributors — selective hiring to extract the project's value while
+   leaving remaining contributors unpaid is explicitly prohibited;
+
+e) Engage in Downstream Lockout with respect to any derivative of the
+   Covered Contributions;
+
+f) Engage in Governance Capture;
+
+g) Engage in Contribution Laundering. Contributions submitted by employees
+   or agents of a Commercial Entity in violation of this license do not
+   grant that entity any usage rights and do not reduce that entity's
+   obligations under this license;
+
+h) Use trademark, patent, or trade secret claims to interfere with any
+   Project Contributor's ability to develop, distribute, or enforce rights
+   in the Covered Contributions;
+
+i) Require any Project Contributor to sign a Contributor License Agreement
+   (CLA), Imposed Monopoly Privileges mislabeled as IP, or similar instrument
+   as a condition of accepting contributions, if doing so would transfer
+   ownership or exclusive licensing rights to the Commercial Entity;
+
+j) Distribute the Covered Contributions in binary form without simultaneously
+   making the complete corresponding source available at no additional cost,
+   under no additional legal restrictions, to all recipients.
+
+--------------------------------------------------------------------------------
+4. HOW TO OBTAIN A COMMERCIAL LICENSE
+--------------------------------------------------------------------------------
+
+A commercial license is available. The negotiation process is as follows:
+
+The Commercial Entity must extend a good-faith offer of full-time employment,
+at market rate, to each and every Project Contributor listed in CONTRIBUTORS
+at the time the entity first seeks to use the Covered Contributions commercially.
+
+The following conditions apply to all such offers and, if accepted, to the
+resulting employment relationship:
+
+a) Compensation must be at or above prevailing market rate for the relevant
+   role and jurisdiction, as determined by publicly available compensation surveys;
+
+b) Source attribution for the Covered Contributions must be permanently
+   retained in any derivative product or service, in both source and
+   binary form;
+
+c) No NDA, non-compete, Imposed Monopoly Privileges mislabeled as IP, or
+   non-disparagement clause may be imposed that would in any way restrict
+   any contributor's ability to continue contributing to ssX or any other
+   open source project in their personal capacity;
+
+d) No CLA or Imposed Monopoly Privileges mislabeled as IP transfer agreement
+   may be required as a condition of continued contribution to ssX;
+
+e) All offers must be extended simultaneously. Sequential offers designed
+   to hire selectively while satisfying the letter of this clause constitute
+   a violation of Section 3;
+
+f) The employment offer may not be used as leverage to alter the governance,
+   licensing, or technical direction of the ssX project;
+
+g) Acceptance or rejection of an offer has no effect on the contributor's
+   standing in the project or their rights under this license.
+
+Acceptance of offers by all Project Contributors constitutes a perpetual,
+royalty-free commercial license for the hiring entity. Rejection by any
+individual contributor is that contributor's sole right and does not obligate
+remaining contributors to accept or reject.
+
+A Commercial Entity that extends good-faith simultaneous offers to all
+Project Contributors and receives rejections from some may petition the
+accepting contributors for a partial commercial license covering only those
+contributors' individual Covered Contributions. Such a partial license
+explicitly does not cover the Covered Contributions of non-accepting
+contributors, and the Commercial Entity remains in violation of Section 3
+if it uses those contributions without consent.
+
+--------------------------------------------------------------------------------
+5. CONTRIBUTOR AUTONOMY AND ANTI-CAPTURE
+--------------------------------------------------------------------------------
+
+a) No Project Contributor may unilaterally grant a commercial license
+   covering another contributor's work.
+
+b) No external funding, sponsorship, or employment relationship may be used
+   to obtain de facto control over the project's licensing or governance
+   decisions. Any agreement between a Project Contributor and a Commercial
+   Entity that purports to grant rights in other contributors' work is void
+   with respect to those contributions.
+
+c) No amendment to this license may be made under conditions of Governance
+   Capture. Any amendment proposed while a Commercial Entity holds
+   disproportionate influence over the contributor base — through employment
+   of a majority of active contributors — is suspended pending resolution
+   of that conflict of interest.
+
+d) This clause may not be waived by any single contributor, including the
+   project's founding members.
+
+--------------------------------------------------------------------------------
+6. PATENT NON-AGGRESSION
+--------------------------------------------------------------------------------
+
+a) Any Commercial Entity that uses, distributes, or incorporates the Covered
+   Contributions — whether under a valid commercial license or otherwise —
+   automatically grants each Project Contributor a perpetual, worldwide,
+   royalty-free, irrevocable license under any patent claims that entity
+   controls which are necessarily infringed by the Covered Contributions.
+
+b) Any Commercial Entity that initiates patent litigation against any Project
+   Contributor alleging that the Covered Contributions infringe a patent —
+   including cross-claims and counterclaims — forfeits any commercial license
+   previously obtained under Section 4, immediately and without recourse,
+   and becomes subject to the full restrictions of Section 3 retroactively
+   from the date of first use.
+
+--------------------------------------------------------------------------------
+7. PAYWALL AND SUBSCRIPTION PROHIBITION
+--------------------------------------------------------------------------------
+
+Distribution of the Covered Contributions, or any derivative thereof, behind
+a subscription paywall, access fee, or support contract as the primary means
+of source access is prohibited. This provision targets the practice of
+technical GPL compliance through source repositories accessible only to
+paying customers. Any recipient of a binary distribution is entitled to
+receive complete corresponding source under the same terms as this license,
+at no additional cost.
+
+--------------------------------------------------------------------------------
+8. NO WARRANTY; NO SUPPORT
+--------------------------------------------------------------------------------
+
+The Covered Contributions are provided "as is." Project Contributors are
+under no obligation to provide support, maintenance, or compatibility
+guarantees to any party operating outside the terms of Section 4.
+
+--------------------------------------------------------------------------------
+9. ENFORCEMENT
+--------------------------------------------------------------------------------
+
+Violation of Section 3 by a Commercial Entity constitutes copyright
+infringement with respect to each Project Contributor whose work is
+incorporated in the infringing use. Each Project Contributor retains
+independent standing to enforce their rights under this license without
+requiring the consent or participation of other contributors.
+
+In any enforcement action brought under this license, the prevailing Project
+Contributor(s) are entitled to recover reasonable attorney's fees and costs.
+A Commercial Entity found to have engaged in Downstream Lockout, Governance
+Capture, or Contribution Laundering as defined in Section 2 shall be liable
+for enhanced damages reflecting the willful nature of the violation.
+
+--------------------------------------------------------------------------------
+10. SEVERABILITY
+--------------------------------------------------------------------------------
+
+If any provision of this license is found unenforceable in a particular
+jurisdiction, that provision shall be modified to the minimum extent
+necessary to make it enforceable, and all other provisions shall remain
+in full effect.
+
+--------------------------------------------------------------------------------
+11. AMENDMENTS
+--------------------------------------------------------------------------------
+
+This license may be amended by consensus of the active Project Contributors
+as recorded in the project's governance documentation, subject to the
+anti-capture provisions of Section 5. Amendments are not retroactive; prior
+versions of this license continue to govern Covered Contributions made
+before the amendment date. The version number in the license header is
+authoritative.
+
+--------------------------------------------------------------------------------
+12. SUPREMACY OF CONTRIBUTOR RIGHTS
+--------------------------------------------------------------------------------
+
+In any conflict between the terms of this Supplemental License and any
+agreement entered into by a Project Contributor with a third party — including
+employment contracts, consulting agreements, or CLAs — this license governs
+with respect to the Covered Contributions. No third-party agreement may
+extinguish another contributor's rights under this license.
+
+================================================================================
+                HUMAN SOVEREIGNTY CLAUSE
+                ("The AI-Assisted" Amendment)
+                     Version 1.0
+================================================================================
+
+This amendment supplements the ssX Supplemental License and applies to
+all contributions made after its effective date.
+
+--------------------------------------------------------------------------------
+1. DEFINITIONS
+--------------------------------------------------------------------------------
+
+"AI-Assisted Contribution" means any contribution to the ssX codebase that
+was created with the aid of an artificial intelligence, Large Language Model,
+code generation tool, or similar computational assistant, where the human
+contributor:
+
+a) Made the primary architectural and design decisions;
+b) Wrote or significantly refactored the core logic themselves;
+c) Verified the code's correctness through testing and review;
+d) Can defend every design decision in a code review.
+
+"Generative AI Output" means code, documentation, or other content that was
+primarily generated by an artificial intelligence system without significant
+human structural modification, verification, or refactoring. This includes
+but is not limited to:
+
+a) Raw output from Large Language Models submitted without human editing
+b) Code where the AI made the primary architectural decisions
+c) Bulk-generated functions or modules without human design input
+d) AI-generated content the contributor cannot defend in code review
+
+"Augmented Coding" means the permitted use of AI tools as aids to enhance
+human-authored work, including:
+
+a) Spell-checking and grammar assistance
+b) Suggesting alternative implementations (human evaluates and chooses)
+c) Refactoring code the human contributor already wrote
+d) Generating unit tests for human-authored code
+e) Documentation assistance (outlines, grammar fixes)
+
+"Structural Modification" means meaningful human intervention that changes
+the fundamental design, logic flow, or architecture of AI-generated content,
+including:
+
+a) Adding comments explaining the "why" of functions (not just "what")
+b) Modifying code paths based on human security analysis
+c) Restructuring modules based on human architectural decisions
+d) Replacing AI-suggested implementations with human-designed alternatives
+
+--------------------------------------------------------------------------------
+2. HUMAN SOVEREIGNTY REQUIREMENT
+--------------------------------------------------------------------------------
+
+All Project Contributors retain sovereign authorship over their contributions.
+By submitting to ssX, each contributor affirms:
+
+a) They are the primary author of the intellectual content they contribute;
+b) They understand and can defend every line of code they submit;
+c) They have made the architectural decisions, not merely accepted AI output;
+d) They take sole responsibility for the logic, security, and correctness
+   of their contributions.
+
+Contributions that are primarily "Generative AI Output" without significant
+human "Structural Modification" are violations of this license and may be
+rejected at the maintainers' discretion.
+
+--------------------------------------------------------------------------------
+3. TRANSPARENCY DISCLOSURE
+--------------------------------------------------------------------------------
+
+All contributors MUST disclose their tool usage in every commit message or
+pull request description using the required format specified in CONTRIBUTING.md.
+
+The following disclosure types are required:
+
+a) "Tool-disclosure: None" - For pure human-authored work
+b) "Tool-disclosure: AI used for [specific permitted use]"
+   - For AI-Assisted Contributions (Augmented Coding)
+c) DO NOT SUBMIT - For Generative AI Output without verification
+
+Failure to include proper disclosure may result in rejection of the
+contribution or revocation of commit authorship.
+
+--------------------------------------------------------------------------------
+4. PROHIBITED PRACTICES
+--------------------------------------------------------------------------------
+
+The following practices are STRICTLY PROHIBITED:
+
+a) Submitting raw Generative AI Output without human verification
+b) Passing off AI-generated code as human-authored without disclosure
+c) Using AI to "explain" code you did not write yourself
+d) Submitting contributions where AI made primary architectural decisions
+e) Bulk-generating code functions without human design input
+
+Contributions in violation of this section do not grant the contributor
+authorship rights and may be reverted.
+
+--------------------------------------------------------------------------------
+5. PERMITTED PRACTICES
+--------------------------------------------------------------------------------
+
+The following practices are PERMITTED under "Augmented Coding":
+
+a) Using AI for spell-checking and documentation grammar
+b) Accepting AI suggestions for alternative implementations (human decides)
+c) Using AI to refactor code the human contributor wrote
+d) Using AI to generate unit tests for human-authored code
+e) Using AI for finding typos in human-written code
+
+In all cases, the human contributor must be the primary decision-maker
+and take sole responsibility for the final contribution.
+
+--------------------------------------------------------------------------------
+6. ENFORCEMENT
+--------------------------------------------------------------------------------
+
+a) Maintainers may reject contributions that appear to be Generative AI
+   Output without significant Structural Modification
+
+b) Repeated violations may result in contributor ban
+
+c) Contributors found to have submitted Generative AI Output as their own
+   work may have commits reverted
+
+d) This clause supplements but does not replace the AI Training
+   Prohibition in BLOCK_AI_TRAINING.md
+
+--------------------------------------------------------------------------------
+7. INTERPRETATION
+--------------------------------------------------------------------------------
+
+This Human Sovereignty Clause is designed to:
+
+a) PERMIT AI-Assisted Contributions (human-driven, AI-aided)
+b) PROHIBIT Generative AI Output passed off as human work
+c) PROTECT the quality and integrity of the ssX codebase
+d) PRESERVE human authorship and accountability
+
+We welcome human contributors who use AI tools responsibly. We reject
+attempts to substitute AI labor for human labor without disclosure.
+
+*The human writes. The human decides. The human defends.*
+*This is the ssX way.*
+
+================================================================================
+                            END OF LICENSE
+================================================================================
+
+For questions about this license, please refer to CODE_OF_SOVEREIGNTY.md,
+CONTRIBUTING.md, or open an issue in the project repository.
+
+The Jesterman guards this license.
+The Fool's Prayer protects these rights.
+The community stands together.
+================================================================================
