@@ -1,5 +1,4 @@
-<<<<<<< HEAD
-# Liberated `systemd`
+# sonicd
 
 Mass surveillance is bad, actually. So here's a fork of `systemd` with surveillance enablement removed, which will be kept up-to-date with other changes in `systemd/main`. However you use this, or do not, is your choice and yours alone.
 
