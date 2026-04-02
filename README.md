@@ -25,7 +25,7 @@ sonicd is a fork of systemd. The upstream repository is https://github.com/syste
   ```
   git clone https://github.com/supersonic-xserver/sonicd
   cd sonicd
-  git remote add upstream https://github.com/systemd/systemd
+  git remote add upstream https://github.com/Sba-Stuff/liberated-systemd
   git fetch upstream
   git log upstream/main..main --oneline
   ```
