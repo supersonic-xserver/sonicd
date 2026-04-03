@@ -20,7 +20,7 @@ Every age verification law we are aware of requires that the mechanism be implem
 
 ## Upstream
 
-sonicd is a fork of systemd. The upstream repository is https://github.com/Sba-Stuff/liberated-systemd. To compare all changes made in this systemdemdemd against upstream since people are overly reliant on the GitHub UI for this:
+sonicd is a fork of systemd. The upstream repository is https://github.com/Sba-Stuff/liberated-systemd. To compare all changes made in sonicd against upstream since people are overly reliant on the GitHub UI for this:
 
   ```
   git clone https://github.com/supersonic-xserver/sonicd
