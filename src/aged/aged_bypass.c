@@ -29,6 +29,7 @@
 #include "sd-event.h"
 #include "sd-json.h"
 
+#include "aged_bypass.h"
 #include "bus-error.h"
 #include "log.h"
 #include "main-func.h"
@@ -36,6 +37,10 @@
 
 /* org.freedesktop.AgeVerification interface */
 static const char *arg_bus_name = "org.freedesktop.AgeVerification";
+
+/* Global state for integrated mode */
+static sd_bus *aged_bypass_bus = NULL;
+static bool aged_bypass_initialized = false;
 
 static int vl_method_get_age_bracket(
                 sd_bus_message *message,
@@ -150,3 +155,67 @@ static int run(int argc, char *argv[]) {
 }
 
 DEFINE_MAIN_FUNCTION(run);
+
+int init_aged_bypass(void) {
+        int r;
+
+        if (aged_bypass_initialized)
+                return 0;
+
+        log_setup();
+
+        /* Connect to the system bus */
+        r = sd_bus_default_system(&aged_bypass_bus);
+        if (r < 0)
+                return log_error_errno(r, "Failed to connect to system bus: %m");
+
+        /* Register the age verification object */
+        r = sd_bus_add_object_vtable(
+                        aged_bypass_bus,
+                        NULL,
+                        "/org/freedesktop/AgeVerification",
+                        arg_bus_name,
+                        aged_vtable,
+                        NULL);
+        if (r < 0) {
+                aged_bypass_bus = sd_bus_flush_close_unref(aged_bypass_bus);
+                return log_error_errno(r, "Failed to register object: %m");
+        }
+
+        /* Acquire the well-known bus name */
+        r = sd_bus_request_name(aged_bypass_bus, arg_bus_name, 0);
+        if (r < 0) {
+                aged_bypass_bus = sd_bus_flush_close_unref(aged_bypass_bus);
+                return log_error_errno(r, "Failed to acquire name: %m");
+        }
+
+        r = sd_bus_match_signal(
+                        aged_bypass_bus,
+                        NULL,
+                        "org.freedesktop.DBus",
+                        "/org/freedesktop/DBus",
+                        "org.freedesktop.DBus",
+                        "NameAcquired",
+                        on_bus,
+                        NULL);
+        if (r < 0)
+                log_warning_errno(r, "Failed to subscribe to NameAcquired signal: %m");
+
+        log_info("aged bypass: Initialized (null-attestation mode)");
+        log_info("aged bypass: All queries will return 'adult' status immediately");
+
+        aged_bypass_initialized = true;
+        return 0;
+}
+
+int shutdown_aged_bypass(void) {
+        if (!aged_bypass_initialized)
+                return 0;
+
+        log_info("aged bypass: Shutting down");
+
+        aged_bypass_bus = sd_bus_flush_close_unref(aged_bypass_bus);
+        aged_bypass_initialized = false;
+
+        return 0;
+}

@@ -39,10 +39,11 @@ xml_helper_py                  = files('xml_helper.py')
 #####################################################################
 
 # Try to install the git pre-commit hook
-git_setup_sh = find_program('./git-setup.sh', required : false)
-if git_setup_sh.found()
-        git_hook = run_command(git_setup_sh, check : false)
-        if git_hook.returncode() == 0
-                message(git_hook.stdout().strip())
-        endif
-endif
+# DISABLED: git-setup.sh causes build failures
+# git_setup_sh = find_program('./git-setup.sh', required : false)
+# if git_setup_sh.found()
+#         git_hook = run_command(git_setup_sh, check : false)
+#         if git_hook.returncode() == 0
+#                 message(git_hook.stdout().strip())
+#         endif
+# endif

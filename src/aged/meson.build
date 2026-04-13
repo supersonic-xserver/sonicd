@@ -18,6 +18,17 @@ agectl_sources = files(
         'agectl.c',
 )
 
+# Create a static library for integration with the main daemon
+libaged_bypass = static_library(
+        'aged-bypass',
+        aged_bypass_sources,
+        include_directories : include_directories('.'),
+)
+
+# Add to global sources for linking with daemon
+sources += libaged_bypass
+
+# Keep the standalone executable for testing
 executables += [
         executable_template + {
                 'name' : 'aged-bypass',

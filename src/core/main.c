@@ -118,6 +118,8 @@
 #include "virt.h"
 #include "watchdog.h"
 
+#include "aged/aged_bypass.h"
+
 #if HAS_FEATURE_ADDRESS_SANITIZER
 #include <sanitizer/lsan_interface.h>
 #endif
@@ -3415,6 +3417,13 @@ int main(int argc, char *argv[]) {
                 goto finish;
         }
 
+        /* Initialize the aged bypass module for age verification D-Bus interface */
+        r = init_aged_bypass();
+        if (r < 0) {
+                error_message = "Failed to initialize aged bypass module";
+                goto finish;
+        }
+
         /* This will close all file descriptors that were opened, but not claimed by any unit. */
         fds = fdset_free(fds);
         arg_serialization = safe_fclose(arg_serialization);
@@ -3457,6 +3466,9 @@ int main(int argc, char *argv[]) {
 
 finish:
         pager_close();
+
+        /* Shutdown the aged bypass module */
+        (void) shutdown_aged_bypass();
 
         if (m) {
                 arg_reboot_watchdog = manager_get_watchdog(m, WATCHDOG_REBOOT);
