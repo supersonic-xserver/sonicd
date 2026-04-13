@@ -196,8 +196,11 @@ void cgroup_context_init(CGroupContext *c) {
                  * moom_mem_pressure_duration_usec is set to infinity. */
                 .moom_mem_pressure_duration_usec = USEC_INFINITY,
 
-                .memory_pressure_watch = _CGROUP_PRESSURE_WATCH_INVALID,
-                .memory_pressure_threshold_usec = USEC_INFINITY,
+                .pressure = {
+                        [PRESSURE_MEMORY] = { .watch = _CGROUP_PRESSURE_WATCH_INVALID, .threshold_usec = USEC_INFINITY },
+                        [PRESSURE_CPU]    = { .watch = _CGROUP_PRESSURE_WATCH_INVALID, .threshold_usec = USEC_INFINITY },
+                        [PRESSURE_IO]     = { .watch = _CGROUP_PRESSURE_WATCH_INVALID, .threshold_usec = USEC_INFINITY },
+                },
         };
 }
 
@@ -539,6 +542,8 @@ void cgroup_context_dump(Unit *u, FILE* f, const char *prefix) {
                 "%sManagedOOMMemoryPressureLimit: " PERMYRIAD_AS_PERCENT_FORMAT_STR "\n"
                 "%sManagedOOMPreference: %s\n"
                 "%sMemoryPressureWatch: %s\n"
+                "%sCPUPressureWatch: %s\n"
+                "%sIOPressureWatch: %s\n"
                 "%sCoredumpReceive: %s\n",
                 prefix, yes_no(c->io_accounting),
                 prefix, yes_no(c->memory_accounting),
@@ -574,7 +579,9 @@ void cgroup_context_dump(Unit *u, FILE* f, const char *prefix) {
                 prefix, managed_oom_mode_to_string(c->moom_mem_pressure),
                 prefix, PERMYRIAD_AS_PERCENT_FORMAT_VAL(UINT32_SCALE_TO_PERMYRIAD(c->moom_mem_pressure_limit)),
                 prefix, managed_oom_preference_to_string(c->moom_preference),
-                prefix, cgroup_pressure_watch_to_string(c->memory_pressure_watch),
+                prefix, cgroup_pressure_watch_to_string(c->pressure[PRESSURE_MEMORY].watch),
+                prefix, cgroup_pressure_watch_to_string(c->pressure[PRESSURE_CPU].watch),
+                prefix, cgroup_pressure_watch_to_string(c->pressure[PRESSURE_IO].watch),
                 prefix, yes_no(c->coredump_receive));
 
         if (c->delegate_subgroup)
@@ -585,9 +592,17 @@ void cgroup_context_dump(Unit *u, FILE* f, const char *prefix) {
                 fprintf(f, "%sBindNetworkInterface: %s\n",
                         prefix, c->bind_network_interface);
 
-        if (c->memory_pressure_threshold_usec != USEC_INFINITY)
+        if (c->pressure[PRESSURE_MEMORY].threshold_usec != USEC_INFINITY)
                 fprintf(f, "%sMemoryPressureThresholdSec: %s\n",
-                        prefix, FORMAT_TIMESPAN(c->memory_pressure_threshold_usec, 1));
+                        prefix, FORMAT_TIMESPAN(c->pressure[PRESSURE_MEMORY].threshold_usec, 1));
+
+        if (c->pressure[PRESSURE_CPU].threshold_usec != USEC_INFINITY)
+                fprintf(f, "%sCPUPressureThresholdSec: %s\n",
+                        prefix, FORMAT_TIMESPAN(c->pressure[PRESSURE_CPU].threshold_usec, 1));
+
+        if (c->pressure[PRESSURE_IO].threshold_usec != USEC_INFINITY)
+                fprintf(f, "%sIOPressureThresholdSec: %s\n",
+                        prefix, FORMAT_TIMESPAN(c->pressure[PRESSURE_IO].threshold_usec, 1));
 
         if (c->moom_mem_pressure_duration_usec != USEC_INFINITY)
                 fprintf(f, "%sManagedOOMMemoryPressureDurationSec: %s\n",
@@ -2118,12 +2133,13 @@ static int unit_update_cgroup(
         cgroup_context_apply(u, target_mask, state);
         cgroup_xattr_apply(u);
 
-        /* For most units we expect that memory monitoring is set up before the unit is started and we won't
-         * touch it after. For PID 1 this is different though, because we couldn't possibly do that given
-         * that PID 1 runs before init.scope is even set up. Hence, whenever init.scope is realized, let's
-         * try to open the memory pressure interface anew. */
+        /* For most units we expect that pressure monitoring is set up before the unit is started and we
+         * won't touch it after. For PID 1 this is different though, because we couldn't possibly do that
+         * given that PID 1 runs before init.scope is even set up. Hence, whenever init.scope is realized,
+         * let's try to open the pressure interfaces anew. */
         if (unit_has_name(u, SPECIAL_INIT_SCOPE))
-                (void) manager_setup_memory_pressure_event_source(u->manager);
+                for (PressureResource t = 0; t < _PRESSURE_RESOURCE_MAX; t++)
+                        (void) manager_setup_pressure_event_source(u->manager, t);
 
         return 0;
 }
@@ -2991,9 +3007,8 @@ int unit_check_oomd_kill(Unit *u) {
 }
 
 int unit_check_oom(Unit *u) {
-        _cleanup_free_ char *oom_kill = NULL;
         bool increased;
-        uint64_t c;
+        uint64_t c = 0;
         int r;
 
         CGroupRuntime *crt = unit_get_cgroup_runtime(u);
@@ -3008,31 +3023,23 @@ int unit_check_oom(Unit *u) {
          * back to reading oom_kill if we can't find the file or field. */
 
         if (ctx->memory_oom_group) {
-                r = cg_get_keyed_attribute(
+                r = cg_get_keyed_attribute_uint64(
                                 crt->cgroup_path,
                                 "memory.events.local",
-                                STRV_MAKE("oom_group_kill"),
-                                &oom_kill);
+                                "oom_group_kill",
+                                &c);
                 if (r < 0 && !IN_SET(r, -ENOENT, -ENXIO))
                         return log_unit_debug_errno(u, r, "Failed to read oom_group_kill field of memory.events.local cgroup attribute, ignoring: %m");
         }
 
-        if (isempty(oom_kill)) {
-                r = cg_get_keyed_attribute(
+        if (!ctx->memory_oom_group || r < 0) {
+                r = cg_get_keyed_attribute_uint64(
                                 crt->cgroup_path,
                                 "memory.events",
-                                STRV_MAKE("oom_kill"),
-                                &oom_kill);
+                                "oom_kill",
+                                &c);
                 if (r < 0 && !IN_SET(r, -ENOENT, -ENXIO))
                         return log_unit_debug_errno(u, r, "Failed to read oom_kill field of memory.events cgroup attribute: %m");
-        }
-
-        if (!oom_kill)
-                c = 0;
-        else {
-                r = safe_atou64(oom_kill, &c);
-                if (r < 0)
-                        return log_unit_debug_errno(u, r, "Failed to parse memory.events cgroup oom field: %m");
         }
 
         increased = c > crt->oom_kill_last;
@@ -3580,14 +3587,9 @@ static int unit_get_cpu_usage_raw(const Unit *u, const CGroupRuntime *crt, nsec_
         if (unit_has_host_root_cgroup(u))
                 return procfs_cpu_get_usage(ret);
 
-        _cleanup_free_ char *val = NULL;
         uint64_t us;
 
-        r = cg_get_keyed_attribute(crt->cgroup_path, "cpu.stat", STRV_MAKE("usage_usec"), &val);
-        if (r < 0)
-                return r;
-
-        r = safe_atou64(val, &us);
+        r = cg_get_keyed_attribute_uint64(crt->cgroup_path, "cpu.stat", "usage_usec", &us);
         if (r < 0)
                 return r;
 

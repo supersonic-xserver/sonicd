@@ -48,3 +48,18 @@ static const char *const console_mode_table[_CONSOLE_MODE_MAX] = {
 };
 
 DEFINE_STRING_TABLE_LOOKUP(console_mode, ConsoleMode);
+
+static const char *const console_transport_table[_CONSOLE_TRANSPORT_MAX] = {
+        [CONSOLE_TRANSPORT_VIRTIO] = "virtio",
+        [CONSOLE_TRANSPORT_SERIAL] = "serial",
+};
+
+DEFINE_STRING_TABLE_LOOKUP(console_transport, ConsoleTransport);
+
+static const char *const firmware_table[_FIRMWARE_MAX] = {
+        [FIRMWARE_UEFI] = "uefi",
+        [FIRMWARE_BIOS] = "bios",
+        [FIRMWARE_NONE] = "none",
+};
+
+DEFINE_STRING_TABLE_LOOKUP(firmware, Firmware);

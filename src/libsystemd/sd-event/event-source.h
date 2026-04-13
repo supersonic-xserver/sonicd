@@ -37,6 +37,8 @@ typedef enum EventSourceType {
         SOURCE_WATCHDOG,
         SOURCE_INOTIFY,
         SOURCE_MEMORY_PRESSURE,
+        SOURCE_CPU_PRESSURE,
+        SOURCE_IO_PRESSURE,
         _SOURCE_EVENT_SOURCE_TYPE_MAX,
         _SOURCE_EVENT_SOURCE_TYPE_INVALID = -EINVAL,
 } EventSourceType;
@@ -155,7 +157,7 @@ struct sd_event_source {
                         size_t write_buffer_size;
                         uint32_t events, revents;
                         LIST_FIELDS(sd_event_source, write_list);
-                } memory_pressure;
+                } pressure;
         };
 };
 

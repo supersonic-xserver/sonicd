@@ -378,7 +378,7 @@ executables += [
                 'dependencies' : libm,
         },
         test_template + {
-                'sources' : files('test-mempress.c'),
+                'sources' : files('test-pressure.c'),
                 'dependencies' : threads,
         },
         test_template + {
@@ -590,7 +590,7 @@ executables += [
                 'dependencies' : common_test_dependencies,
         },
         core_test_template + {
-                'sources' : files('test-loop-block.c'),
+                'sources' : files('test-loop-util.c'),
                 'dependencies' : [threads],
                 'parallel' : false,
         },

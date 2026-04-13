@@ -15,9 +15,9 @@
 #include <curl/curl.h>
 #include <sys/stat.h>
 
-#include "shared-forward.h"
-#include "import-compress.h"
+#include "compress.h"
 #include "openssl-util.h"
+#include "shared-forward.h"
 
 typedef struct CurlGlue CurlGlue;
 typedef struct PullJob PullJob;
@@ -84,7 +84,7 @@ typedef struct PullJob {
         usec_t mtime;
         char *content_type;
 
-        ImportCompress compress;
+        Compressor *compress;
 
         unsigned progress_percent;
         usec_t start_usec;

@@ -162,6 +162,11 @@ static bool firmware_data_matches_machine(const FirmwareData *fwd, const char *a
                 if (!streq((*t)->architecture, arch))
                         continue;
 
+                /* The machine types in firmware descriptions are glob patterns such as "pc-q35-*", but
+                 * we pass the short alias (e.g. "q35") as the machine type to QEMU as it always points to
+                 * the latest version. We can't use fnmatch() here because "q35" doesn't match the
+                 * "pc-q35-*" glob, so instead we use substring matching to check if our machine type
+                 * appears in the pattern. */
                 STRV_FOREACH(m, (*t)->machines)
                         if (strstr(*m, machine))
                                 return true;
@@ -534,7 +539,7 @@ int find_qemu_binary(char **ret_qemu_binary) {
          * If the native architecture is not supported by qemu -EOPNOTSUPP will be returned;
          */
 
-        FOREACH_STRING(s, "qemu", "qemu-kvm") {
+        FOREACH_STRING(s, "qemu", "qemu-kvm", "/usr/libexec/qemu-kvm") {
                 r = find_executable(s, ret_qemu_binary);
                 if (r == 0)
                         return 0;

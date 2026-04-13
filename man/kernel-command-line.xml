@@ -69,6 +69,7 @@
         <term><varname>systemd.import_credentials=</varname></term>
         <term><varname>systemd.reload_limit_interval_sec=</varname></term>
         <term><varname>systemd.reload_limit_burst=</varname></term>
+        <term><varname>systemd.minimum_uptime_sec=</varname></term>
         <listitem>
           <para>Parameters understood by the system and service
           manager to control system behavior. For details, see
@@ -823,6 +824,22 @@
         <citerefentry><refentrytitle>systemd-imdsd@.service</refentrytitle><manvolnum>8</manvolnum></citerefentry>
         and
         <citerefentry><refentrytitle>systemd-imds-generator</refentrytitle><manvolnum>8</manvolnum></citerefentry>
+        for details.</para>
+
+        <xi:include href="version-info.xml" xpointer="v261"/></listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><varname>systemd.sysext=</varname></term>
+        <term><varname>systemd.confext=</varname></term>
+        <term><varname>rd.systemd.sysext=</varname></term>
+        <term><varname>rd.systemd.confext=</varname></term>
+
+        <listitem><para>Take boolean arguments, default to on. Control whether system and configuration
+        extensions for the initrd (<varname>rd.systemd.sysext=</varname>, <varname>rd.systemd.confext=</varname>)
+        and for the main system (<varname>systemd.sysext=</varname>, <varname>systemd.confext=</varname>) are
+        merged automatically on boot. See
+        <citerefentry><refentrytitle>systemd-sysext</refentrytitle><manvolnum>8</manvolnum></citerefentry>
         for details.</para>
 
         <xi:include href="version-info.xml" xpointer="v261"/></listitem>

@@ -1554,6 +1554,10 @@ static int cell_data_compare(TableData *a, size_t index_a, TableData *b, size_t 
 static int table_data_compare(const size_t *a, const size_t *b, Table *t) {
         int r;
 
+        /* This is called from qsort()s inner loops. Correctly implemented qsort will never pass NULL so we
+           just suppress the check via POINTER_MAY_BE_NULL instead of assert() to avoid the runtime cost. */
+        POINTER_MAY_BE_NULL(a);
+        POINTER_MAY_BE_NULL(b);
         assert(t);
         assert(t->sort_map);
 
@@ -2228,7 +2232,7 @@ int _table_sync_column_widths(size_t column, Table *a, ...) {
         return r;
 }
 
-int table_print(Table *t, FILE *f) {
+int table_print_full(Table *t, FILE *f, bool flush) {
         size_t n_rows, *minimum_width, *maximum_width, display_columns, *requested_width,
                 table_minimum_width, table_maximum_width, table_requested_width, table_effective_width,
                 *width = NULL;
@@ -2648,7 +2652,19 @@ int table_print(Table *t, FILE *f) {
                 } while (more_sublines);
         }
 
+        if (!flush)
+                return 0;
+
         return fflush_and_check(f);
+}
+
+int table_print_or_warn(Table *t) {
+        int r;
+
+        r = table_print(t);
+        if (r < 0)
+                return table_log_print_error(r);
+        return 0;
 }
 
 int table_format(Table *t, char **ret) {
@@ -2663,7 +2679,7 @@ int table_format(Table *t, char **ret) {
         if (!f)
                 return -ENOMEM;
 
-        r = table_print(t, f);
+        r = table_print_full(t, f, /* flush= */ true);
         if (r < 0)
                 return r;
 
@@ -3152,7 +3168,7 @@ int table_print_json(Table *t, FILE *f, sd_json_format_flags_t flags) {
         assert(t);
 
         if (!sd_json_format_enabled(flags)) /* If JSON output is turned off, use regular output */
-                return table_print(t, f);
+                return table_print_full(t, f, /* flush= */ true);
 
         if (!f)
                 f = stdout;

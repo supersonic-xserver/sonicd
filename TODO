@@ -119,12 +119,15 @@ Deprecations and removals:
   similar "devices"
 
 Features:
+* sysext: make systemd-{sys,conf}ext-sysroot.service work in the split '/var'
+  configuration.
+
+* introduce a concept of /etc/machine-info "TAGS=" field that allows tagging
+  machines with zero, one or more roles, states or other forms of
+  categorization. Then, add a way of using this in sysupdate to automatically
+  enable certain transfers, one for each role.
 
 * sd-varlink: add fully async modes of the protocol upgrade stuff
-
-* sd-varlink: optimize the read-byte-by-byte mode in case upgrade mode is
-  enabled, via recvmsg() with MSG_SEEK: first read non-destrictively, look for
-  NUL byte, and only then flush out
 
 * repart: maybe remove iso9660/eltorito superblock from disk when booting via
   gpt, if there is one.
@@ -297,9 +300,6 @@ Features:
 
 * Add knob to cryptsetup, to trigger automatic reboot on failure to unlock
   disk. Enable this by default for rootfs, also in gpt-auto-generator
-
-* Add RebootUptimeMinSec= knob to PID 1, that makes systemd-shutdown sleep
-  until the specified uptime has passed, to lengthen tight boot loops.
 
 * replace bootctl's PE version check to actually use APIs from pe-binary.[ch]
   to find binary version.
@@ -1354,8 +1354,6 @@ Features:
 * automatic boot assessment: add one more default success check that just waits
   for a bit after boot, and blesses the boot if the system stayed up that long.
 
-* systemd-repart: add support for generating ISO9660 images
-
 * systemd-repart: in addition to the existing "factory reset" mode (which
   simply empties existing partitions marked for that). add a mode where
   partitions marked for it are entirely removed. Use case: remove secondary OS
@@ -1773,9 +1771,6 @@ Features:
     i.e. a Compress=no option in the transfer definitions
 
 * in sd-id128: also parse UUIDs in RFC4122 URN syntax (i.e. chop off urn:uuid: prefix)
-
-* systemd-sysext: optionally, run it in initrd already, before transitioning
-  into host, to open up possibility for services shipped like that.
 
 * whenever we receive fds via SCM_RIGHTS make sure none got dropped due to the
   reception limit the kernel silently enforces.

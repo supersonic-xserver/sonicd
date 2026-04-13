@@ -127,6 +127,12 @@
 #  define _retain_
 #endif
 
+#if HAVE_ATTRIBUTE_NO_REORDER
+#  define _no_reorder_ __attribute__((__no_reorder__))
+#else
+#  define _no_reorder_
+#endif
+
 #if __GNUC__ >= 15
 #  define _nonnull_if_nonzero_(p, n) __attribute__((nonnull_if_nonzero(p, n)))
 #else
@@ -230,6 +236,12 @@ assert_cc(sizeof(long long) == sizeof(intmax_t));
         ({                                              \
                 const typeof(x) _d = MAX3(x, y, z);     \
                 MAX(_d, a);                             \
+        })
+
+#define MAX5(x, y, z, a, b)                             \
+        ({                                              \
+                const typeof(x) _e = MAX4(x, y, z, a);  \
+                MAX(_e, b);                             \
         })
 
 #undef MIN

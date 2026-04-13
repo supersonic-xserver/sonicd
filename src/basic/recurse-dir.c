@@ -27,6 +27,9 @@
 #define DEFAULT_RECURSION_MAX 100
 
 static int sort_func(struct dirent * const *a, struct dirent * const *b) {
+        assert(a);
+        assert(b);
+
         return strcmp((*a)->d_name, (*b)->d_name);
 }
 
@@ -63,6 +66,8 @@ int readdir_all(int dir_fd, RecurseDirFlags flags, DirectoryEntries **ret) {
                 size_t bs;
                 ssize_t n;
 
+                /* Silence static analyzers, MALLOC_SIZEOF_SAFE is at least as large as the allocation */
+                assert(MALLOC_SIZEOF_SAFE(de) >= offsetof(DirectoryEntries, buffer));
                 bs = MIN(MALLOC_SIZEOF_SAFE(de) - offsetof(DirectoryEntries, buffer), (size_t) SSIZE_MAX);
                 assert(bs > de->buffer_size);
 

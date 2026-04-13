@@ -602,6 +602,8 @@ TEST(sequence_numbers) {
 }
 
 static int expected_result(uint64_t needle, const uint64_t *candidates, const uint64_t *offset, size_t n, direction_t direction, uint64_t *ret) {
+        assert(ret);
+
         switch (direction) {
         case DIRECTION_DOWN:
                 for (size_t i = 0; i < n; i++) {
@@ -636,6 +638,8 @@ static int expected_result(uint64_t needle, const uint64_t *candidates, const ui
 }
 
 static int expected_result_next(uint64_t needle, const uint64_t *candidates, const uint64_t *offset, size_t n, direction_t direction, uint64_t *ret) {
+        assert(ret);
+
         switch (direction) {
         case DIRECTION_DOWN:
                 for (size_t i = 0; i < n; i++)

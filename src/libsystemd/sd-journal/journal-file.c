@@ -381,7 +381,7 @@ static Compression getenv_compression(void) {
         if (r >= 0)
                 return r ? DEFAULT_COMPRESSION : COMPRESSION_NONE;
 
-        c = compression_from_string(e);
+        c = compression_from_string_harder(e);
         if (c < 0) {
                 log_debug_errno(c, "Failed to parse SYSTEMD_JOURNAL_COMPRESS value, ignoring: %s", e);
                 return DEFAULT_COMPRESSION;
@@ -1976,6 +1976,10 @@ static int maybe_decompress_payload(
                                         *ret_size = 0;
                                 return 0;
                         }
+
+                        /* Caller only wants to check field existence, skip full decompression */
+                        if (!ret_data && !ret_size)
+                                return 1;
                 }
 
                 r = decompress_blob(compression, payload, size, &f->compress_buffer, &rsize, 0);
@@ -2118,6 +2122,8 @@ static int link_entry_into_array(
         assert(f->header);
         assert(first);
         assert(idx);
+        POINTER_MAY_BE_NULL(tail);
+        POINTER_MAY_BE_NULL(tidx);
         assert(p > 0);
 
         a = tail ? le32toh(*tail) : le64toh(*first);

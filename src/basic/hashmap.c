@@ -859,6 +859,8 @@ int set_ensure_allocated(Set **s, const struct hash_ops *hash_ops) {
 int hashmap_ensure_put(Hashmap **h, const struct hash_ops *hash_ops, const void *key, void *value) {
         int r;
 
+        assert(h);
+
         r = hashmap_ensure_allocated(h, hash_ops);
         if (r < 0)
                 return r;
@@ -868,6 +870,8 @@ int hashmap_ensure_put(Hashmap **h, const struct hash_ops *hash_ops, const void 
 
 int ordered_hashmap_ensure_put(OrderedHashmap **h, const struct hash_ops *hash_ops, const void *key, void *value) {
         int r;
+
+        assert(h);
 
         r = ordered_hashmap_ensure_allocated(h, hash_ops);
         if (r < 0)
@@ -879,6 +883,8 @@ int ordered_hashmap_ensure_put(OrderedHashmap **h, const struct hash_ops *hash_o
 int ordered_hashmap_ensure_replace(OrderedHashmap **h, const struct hash_ops *hash_ops, const void *key, void *value) {
         int r;
 
+        assert(h);
+
         r = ordered_hashmap_ensure_allocated(h, hash_ops);
         if (r < 0)
                 return r;
@@ -888,6 +894,8 @@ int ordered_hashmap_ensure_replace(OrderedHashmap **h, const struct hash_ops *ha
 
 int hashmap_ensure_replace(Hashmap **h, const struct hash_ops *hash_ops, const void *key, void *value) {
         int r;
+
+        assert(h);
 
         r = hashmap_ensure_allocated(h, hash_ops);
         if (r < 0)
@@ -1293,6 +1301,8 @@ int set_put(Set *s, const void *key) {
 
 int set_ensure_put(Set **s, const struct hash_ops *hash_ops, const void *key) {
         int r;
+
+        assert(s);
 
         r = set_ensure_allocated(s, hash_ops);
         if (r < 0)

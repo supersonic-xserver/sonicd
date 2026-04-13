@@ -229,7 +229,7 @@ int start_upload(Uploader *u,
                 h = l;
 
                 if (u->compression) {
-                        _cleanup_free_ char *header = strjoin("Content-Encoding: ", compression_lowercase_to_string(u->compression->algorithm));
+                        _cleanup_free_ char *header = strjoin("Content-Encoding: ", compression_to_string(u->compression->algorithm));
                         if (!header)
                                 return log_oom();
 
@@ -380,7 +380,7 @@ static size_t fd_input_callback(void *buf, size_t size, size_t nmemb, void *user
                 r = compress_blob(u->compression->algorithm, compression_buffer, n, buf, size * nmemb, &compressed_size, u->compression->level);
                 if (r < 0) {
                         log_error_errno(r, "Failed to compress %zd bytes by %s with level %i: %m",
-                                        n, compression_lowercase_to_string(u->compression->algorithm), u->compression->level);
+                                        n, compression_to_string(u->compression->algorithm), u->compression->level);
                         return CURL_READFUNC_ABORT;
                 }
                 assert(compressed_size <= size * nmemb);
@@ -539,7 +539,7 @@ static int update_content_encoding_header(Uploader *u, const CompressionConfig *
                 return 0; /* Already picked the algorithm. Let's shortcut. */
 
         if (cc) {
-                _cleanup_free_ char *header = strjoin("Content-Encoding: ", compression_lowercase_to_string(cc->algorithm));
+                _cleanup_free_ char *header = strjoin("Content-Encoding: ", compression_to_string(cc->algorithm));
                 if (!header)
                         return log_oom();
 
@@ -583,7 +583,7 @@ static int update_content_encoding_header(Uploader *u, const CompressionConfig *
         u->compression = cc;
 
         if (cc)
-                log_debug("Using compression algorithm %s with compression level %i.", compression_lowercase_to_string(cc->algorithm), cc->level);
+                log_debug("Using compression algorithm %s with compression level %i.", compression_to_string(cc->algorithm), cc->level);
         else
                 log_debug("Disabled compression algorithm.");
         return 0;
@@ -621,7 +621,7 @@ static int parse_accept_encoding_header(Uploader *u) {
                 if (streq(word, "*"))
                         return update_content_encoding_header(u, ordered_hashmap_first(arg_compression));
 
-                Compression c = compression_lowercase_from_string(word);
+                Compression c = compression_from_string_harder(word);
                 if (c <= 0 || !compression_supported(c))
                         continue; /* unsupported or invalid algorithm. */
 

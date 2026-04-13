@@ -90,6 +90,8 @@ int parse_path_argument(const char *path, bool suppress_root, char **arg) {
         char *p;
         int r;
 
+        assert(arg);
+
         /*
          * This function is intended to be used in command line parsers, to handle paths that are passed
          * in. It makes the path absolute, and reduces it to NULL if omitted or root (the latter optionally).
@@ -139,11 +141,7 @@ int parse_signal_argument(const char *s, int *ret) {
                                 return table_log_add_error(r);
                 }
 
-                r = table_print(table, NULL);
-                if (r < 0)
-                        return table_log_print_error(r);
-
-                return 0;
+                return table_print_or_warn(table);
         }
 
         r = signal_from_string(s);

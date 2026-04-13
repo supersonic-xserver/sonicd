@@ -41,6 +41,7 @@
 #include "fs-util.h"
 #include "glob-util.h"
 #include "image-policy.h"
+#include "io-util.h"
 #include "journal-internal.h"
 #include "journal-util.h"
 #include "json-util.h"
@@ -563,14 +564,14 @@ static int print_list(FILE* file, sd_journal *j, Table *t) {
         _cleanup_free_ char
                 *mid = NULL, *pid = NULL, *uid = NULL, *gid = NULL,
                 *sgnl = NULL, *exe = NULL, *comm = NULL,
-                *filename = NULL, *truncated = NULL, *coredump = NULL;
+                *filename = NULL, *truncated = NULL;
         const void *d;
         size_t l;
         usec_t ts;
         int r, signal_as_int = 0;
         const char *present = NULL, *color = NULL;
         uint64_t size = UINT64_MAX;
-        bool normal_coredump;
+        bool normal_coredump, has_inline_coredump;
         uid_t uid_as_int = UID_INVALID;
         gid_t gid_as_int = GID_INVALID;
         pid_t pid_as_int = 0;
@@ -589,8 +590,10 @@ static int print_list(FILE* file, sd_journal *j, Table *t) {
                 RETRIEVE(d, l, "COREDUMP_COMM", comm);
                 RETRIEVE(d, l, "COREDUMP_FILENAME", filename);
                 RETRIEVE(d, l, "COREDUMP_TRUNCATED", truncated);
-                RETRIEVE(d, l, "COREDUMP", coredump);
         }
+
+        /* Check for an inline coredump without copying the (potentially large) payload to heap. */
+        has_inline_coredump = sd_journal_get_data(j, "COREDUMP", NULL, NULL) >= 0;
 
         if (!pid || !uid || !gid || !sgnl || !comm) {
                 log_warning("Found a coredump entry without mandatory fields (PID=%s, UID=%s, GID=%s, SIGNAL=%s, COMM=%s), ignoring.",
@@ -615,7 +618,7 @@ static int print_list(FILE* file, sd_journal *j, Table *t) {
                         return r;
 
                 analyze_coredump_file(filename, &present, &color, &size);
-        } else if (coredump)
+        } else if (has_inline_coredump)
                 present = "journal";
         else if (normal_coredump) {
                 present = "none";
@@ -651,12 +654,12 @@ static int print_info(FILE *file, sd_journal *j, bool need_space) {
                 *boot_id = NULL, *machine_id = NULL, *hostname = NULL,
                 *slice = NULL, *cgroup = NULL, *owner_uid = NULL,
                 *message = NULL, *timestamp = NULL, *filename = NULL,
-                *truncated = NULL, *coredump = NULL,
+                *truncated = NULL,
                 *pkgmeta_name = NULL, *pkgmeta_version = NULL, *pkgmeta_json = NULL,
                 *tid = NULL, *thread_name = NULL;
         const void *d;
         size_t l;
-        bool normal_coredump;
+        bool normal_coredump, has_inline_coredump;
         int r;
 
         assert(file);
@@ -683,7 +686,6 @@ static int print_info(FILE *file, sd_journal *j, bool need_space) {
                 RETRIEVE(d, l, "COREDUMP_TIMESTAMP", timestamp);
                 RETRIEVE(d, l, "COREDUMP_FILENAME", filename);
                 RETRIEVE(d, l, "COREDUMP_TRUNCATED", truncated);
-                RETRIEVE(d, l, "COREDUMP", coredump);
                 RETRIEVE(d, l, "COREDUMP_PACKAGE_NAME", pkgmeta_name);
                 RETRIEVE(d, l, "COREDUMP_PACKAGE_VERSION", pkgmeta_version);
                 RETRIEVE(d, l, "COREDUMP_PACKAGE_JSON", pkgmeta_json);
@@ -693,6 +695,9 @@ static int print_info(FILE *file, sd_journal *j, bool need_space) {
                 RETRIEVE(d, l, "_MACHINE_ID", machine_id);
                 RETRIEVE(d, l, "MESSAGE", message);
         }
+
+        /* Check for an inline coredump without copying the (potentially large) payload to heap. */
+        has_inline_coredump = sd_journal_get_data(j, "COREDUMP", NULL, NULL) >= 0;
 
         if (need_space)
                 fputs("\n", file);
@@ -831,7 +836,7 @@ static int print_info(FILE *file, sd_journal *j, bool need_space) {
                 if (size != UINT64_MAX)
                         fprintf(file, "  Size on Disk: %s\n", FORMAT_BYTES(size));
 
-        } else if (coredump)
+        } else if (has_inline_coredump)
                 fprintf(file, "       Storage: journal\n");
         else
                 fprintf(file, "       Storage: none\n");
@@ -1109,7 +1114,7 @@ static int save_core(sd_journal *j, FILE *file, char **path, bool *unlink_temp) 
                         goto error;
                 }
 
-                r = decompress_stream(filename, fdf, fd, -1);
+                r = decompress_stream_by_filename(filename, fdf, fd, -1);
                 if (r < 0) {
                         log_error_errno(r, "Failed to decompress %s: %m", filename);
                         goto error;
@@ -1120,8 +1125,6 @@ static int save_core(sd_journal *j, FILE *file, char **path, bool *unlink_temp) 
                 goto error;
 #endif
         } else {
-                ssize_t sz;
-
                 /* We want full data, nothing truncated. */
                 sd_journal_set_data_threshold(j, 0);
 
@@ -1133,14 +1136,9 @@ static int save_core(sd_journal *j, FILE *file, char **path, bool *unlink_temp) 
                 data += 9;
                 len -= 9;
 
-                sz = write(fd, data, len);
-                if (sz < 0) {
-                        r = log_error_errno(errno, "Failed to write output: %m");
-                        goto error;
-                }
-                if (sz != (ssize_t) len) {
-                        log_error("Short write to output.");
-                        r = -EIO;
+                r = loop_write(fd, data, len);
+                if (r < 0) {
+                        log_error_errno(r, "Failed to write output: %m");
                         goto error;
                 }
         }

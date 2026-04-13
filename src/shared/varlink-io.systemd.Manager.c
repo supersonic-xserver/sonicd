@@ -75,6 +75,14 @@ static SD_VARLINK_DEFINE_STRUCT_TYPE(
                 SD_VARLINK_DEFINE_FIELD(DefaultMemoryPressureThresholdUSec, SD_VARLINK_INT, 0),
                 SD_VARLINK_FIELD_COMMENT("https://www.freedesktop.org/software/systemd/man/"PROJECT_VERSION_STR"/systemd-system.conf.html#DefaultMemoryPressureWatch="),
                 SD_VARLINK_DEFINE_FIELD(DefaultMemoryPressureWatch, SD_VARLINK_STRING, 0),
+                SD_VARLINK_FIELD_COMMENT("https://www.freedesktop.org/software/systemd/man/"PROJECT_VERSION_STR"/systemd-system.conf.html#DefaultCPUPressureThresholdUSec="),
+                SD_VARLINK_DEFINE_FIELD(DefaultCPUPressureThresholdUSec, SD_VARLINK_INT, 0),
+                SD_VARLINK_FIELD_COMMENT("https://www.freedesktop.org/software/systemd/man/"PROJECT_VERSION_STR"/systemd-system.conf.html#DefaultCPUPressureWatch="),
+                SD_VARLINK_DEFINE_FIELD(DefaultCPUPressureWatch, SD_VARLINK_STRING, 0),
+                SD_VARLINK_FIELD_COMMENT("https://www.freedesktop.org/software/systemd/man/"PROJECT_VERSION_STR"/systemd-system.conf.html#DefaultIOPressureThresholdUSec="),
+                SD_VARLINK_DEFINE_FIELD(DefaultIOPressureThresholdUSec, SD_VARLINK_INT, 0),
+                SD_VARLINK_FIELD_COMMENT("https://www.freedesktop.org/software/systemd/man/"PROJECT_VERSION_STR"/systemd-system.conf.html#DefaultIOPressureWatch="),
+                SD_VARLINK_DEFINE_FIELD(DefaultIOPressureWatch, SD_VARLINK_STRING, 0),
                 SD_VARLINK_FIELD_COMMENT("https://www.freedesktop.org/software/systemd/man/"PROJECT_VERSION_STR"/systemd-system.conf.html#RuntimeWatchdogSec="),
                 SD_VARLINK_DEFINE_FIELD(RuntimeWatchdogUSec, SD_VARLINK_INT, SD_VARLINK_NULLABLE),
                 SD_VARLINK_FIELD_COMMENT("https://www.freedesktop.org/software/systemd/man/"PROJECT_VERSION_STR"/systemd-system.conf.html#RebootWatchdogSec="),
@@ -100,7 +108,9 @@ static SD_VARLINK_DEFINE_STRUCT_TYPE(
                 SD_VARLINK_FIELD_COMMENT("The console on which systemd asks for confirmation when spawning processes"),
                 SD_VARLINK_DEFINE_FIELD(ConfirmSpawn, SD_VARLINK_STRING, SD_VARLINK_NULLABLE),
                 SD_VARLINK_FIELD_COMMENT("Root of the control group hierarchy that the manager is running in"),
-                SD_VARLINK_DEFINE_FIELD(ControlGroup, SD_VARLINK_STRING, SD_VARLINK_NULLABLE));
+                SD_VARLINK_DEFINE_FIELD(ControlGroup, SD_VARLINK_STRING, SD_VARLINK_NULLABLE),
+                SD_VARLINK_FIELD_COMMENT("https://www.freedesktop.org/software/systemd/man/"PROJECT_VERSION_STR"/systemd-system.conf.html#DefaultMemoryZSwapWriteback="),
+                SD_VARLINK_DEFINE_FIELD(DefaultMemoryZSwapWriteback, SD_VARLINK_BOOL, 0));
 
 static SD_VARLINK_DEFINE_STRUCT_TYPE(
                 ManagerRuntime,

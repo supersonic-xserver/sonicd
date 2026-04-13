@@ -794,6 +794,8 @@ int device_monitor_send(
 
 static void bpf_stmt(struct sock_filter *ins, unsigned *i,
                      unsigned short code, unsigned data) {
+        assert(i);
+
         ins[(*i)++] = (struct sock_filter) {
                 .code = code,
                 .k = data,
@@ -803,6 +805,8 @@ static void bpf_stmt(struct sock_filter *ins, unsigned *i,
 static void bpf_jmp(struct sock_filter *ins, unsigned *i,
                     unsigned short code, unsigned data,
                     unsigned short jt, unsigned short jf) {
+        assert(i);
+
         ins[(*i)++] = (struct sock_filter) {
                 .code = code,
                 .jt = jt,

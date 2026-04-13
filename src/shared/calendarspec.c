@@ -50,6 +50,7 @@ static CalendarComponent* chain_free(CalendarComponent *c) {
 DEFINE_TRIVIAL_CLEANUP_FUNC(CalendarComponent*, chain_free);
 
 CalendarSpec* calendar_spec_free(CalendarSpec *c) {
+        POINTER_MAY_BE_NULL(c);
 
         if (!c)
                 return NULL;
@@ -67,6 +68,9 @@ CalendarSpec* calendar_spec_free(CalendarSpec *c) {
 
 static int component_compare(CalendarComponent * const *a, CalendarComponent * const *b) {
         int r;
+
+        assert(a);
+        assert(b);
 
         r = CMP((*a)->start, (*b)->start);
         if (r != 0)
@@ -498,6 +502,10 @@ static int parse_one_number(const char *p, const char **e, unsigned long *ret) {
         char *ee = NULL;
         unsigned long value;
 
+        assert(p);
+        assert(e);
+        assert(ret);
+
         errno = 0;
         value = strtoul(p, &ee, 10);
         if (errno > 0)
@@ -514,6 +522,9 @@ static int parse_component_decimal(const char **p, bool usec, int *res) {
         unsigned long value;
         const char *e = NULL;
         int r;
+
+        assert(p);
+        assert(res);
 
         if (!ascii_isdigit(**p))
                 return -EINVAL;
@@ -580,6 +591,8 @@ static int calendarspec_from_time_t(CalendarSpec *c, time_t time) {
         struct tm tm;
         int r;
 
+        assert(c);
+
         if ((usec_t) time > USEC_INFINITY / USEC_PER_SEC)
                 return -ERANGE;
 
@@ -627,9 +640,8 @@ static int calendarspec_from_time_t(CalendarSpec *c, time_t time) {
 static int prepend_component(const char **p, bool usec, unsigned nesting, CalendarComponent **c) {
         int r, start, stop = -1, repeat = 0;
         CalendarComponent *cc;
-        const char *e = *p;
+        const char *e = *ASSERT_PTR(p);
 
-        assert(p);
         assert(c);
 
         if (nesting > CALENDARSPEC_COMPONENTS_MAX)
@@ -1228,6 +1240,8 @@ static int tm_within_bounds(struct tm *tm, bool utc) {
 static bool matches_weekday(int weekdays_bits, const struct tm *tm, bool utc) {
         struct tm t;
         int k;
+
+        assert(tm);
 
         if (weekdays_bits < 0 || weekdays_bits >= BITS_WEEKDAYS)
                 return true;

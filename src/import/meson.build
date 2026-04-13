@@ -17,11 +17,7 @@ if conf.get('ENABLE_IMPORTD') != 1
 endif
 
 common_deps = [
-        libbzip2,
         libcurl,
-        libxz,
-        libz,
-        libzstd,
 ]
 
 executables += [
@@ -35,7 +31,6 @@ executables += [
                 'extract' : files(
                         'oci-util.c',
                         'import-common.c',
-                        'import-compress.c',
                         'qcow2-util.c',
                 ),
                 'dependencies' : [common_deps, threads],

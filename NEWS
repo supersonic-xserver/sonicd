@@ -4,6 +4,13 @@ CHANGES WITH 261 in spe:
 
         Feature Removals and Incompatible Changes:
 
+        * systemd-nspawn's --user= option has been renamed to --uid=. The -u
+          short option continues to work. The old --user NAME and --user=NAME
+          form (with and without "=") are still accepted but deprecated; a warning
+          is emitted suggesting --uid=NAME. The --user option (without an argument)
+          has been repurposed as a standalone switch (without argument) to select
+          the user service manager scope, matching --system.
+
         * It was discovered that systemd-stub does not measure all the events
           it measures to the TPM to the hardware CC registers (e.g. Intel TDX
           RTMRs) using EFI_CC_MEASUREMENT_PROTOCOL. In particular, devicetree,
@@ -15,11 +22,23 @@ CHANGES WITH 261 in spe:
 
         New features:
 
+        * A new tmpfiles.d/root.conf has been added that sets permissions
+          on the root directory (/) to 0555
+
         * Networking to cloud IMDS services may be locked down for recognized
           clouds. This is recommended for secure installations, but typically
           conflicts with traditional IMDS clients such as cloud-init, which
           require direct IMDS access. The new meson option "-Dimds-network="
           can be used to change the default mode to "locked" at build-time.
+
+        Changes in systemd-sysext/systemd-confext:
+
+        * New initrd services systemd-sysext-sysroot.service and
+          systemd-confext-sysroot.service are provided. These services are
+          used to merge system and configuration extensions for the main system
+          from the initrd. This overcomes the limitation that system and
+          configuration extensions merged from the main system itself cannot be
+          used to modify the resources which are used in the early boot.
 
 CHANGES WITH 260:
 
@@ -682,9 +701,9 @@ CHANGES WITH 259:
         systemd-sysext/systemd-confext:
 
         * systemd-sysext and systemd-confext now support configuration files
-          /etc/systemd/systemd-sysext.conf and /etc/systemd/systemd-confext.conf,
-          which can be used to configure mutability or the image policy to
-          apply to DDI images.
+          /etc/systemd/sysext.conf and /etc/systemd/confext.conf, which can be
+          used to configure mutability or the image policy to apply to DDI
+          images.
 
         * systemd-sysext's and systemd-confext's --mutable= switch now accepts
           a new value "help" for listing available mutability modes.
