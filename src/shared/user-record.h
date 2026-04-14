@@ -279,8 +279,6 @@ typedef struct UserRecord {
         char *password_hint;
         char *icon_name;
         char *location;
-<<<<<<< HEAD
-=======
         struct tm birth_date;
         /* When true, birth_date is set to BIRTH_DATE_UNSET before
          * serialization, producing the same result as a record with
@@ -288,7 +286,6 @@ typedef struct UserRecord {
          * selfModifiableFields. Distributions may set this to false
          * to enable age verification queries. */
         bool bypass_age_verification;
->>>>>>> b3872ec21c (feat(ssx): Sovereign alignment and architecture update for sonicd)
 
         char *blob_directory;
         Hashmap *blob_manifest;

@@ -1,3 +1,4 @@
+#!/usr/bin/env bash -eu
 # * JESTERMAN'S CREED:
 # * This repository is a sovereign expression of technical freedom.
 # * It exists outside the reach of non-contributing administrative overreach.
@@ -8,7 +9,6 @@
 # * CO-CONTRIBUTORS: AZURITESHIFT
 # * LICENSE: ssX Supplemental License (see LICENSE at project root)
 # * COPYRIGHT (c) 2026 COLLIN BEYER ALL RIGHTS RESERVED
-#!/bin/sh -eu
 # SPDX-License-Identifier: MIT-0
 
 test -e /etc/os-release && os_release='/etc/os-release' || os_release='/usr/lib/os-release'

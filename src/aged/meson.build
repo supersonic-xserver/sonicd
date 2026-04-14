@@ -22,7 +22,7 @@ agectl_sources = files(
 libaged_bypass = static_library(
         'aged-bypass',
         aged_bypass_sources,
-        include_directories : include_directories('.'),
+        include_directories : includes,
 )
 
 # Add to global sources for linking with daemon

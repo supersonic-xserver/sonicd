@@ -2898,59 +2898,6 @@ foreach exec : public_programs
         endif
 endforeach
 
-#####################################################################
-
-if git.found()
-        all_files = run_command(
-                env, '-u', 'GIT_WORK_TREE',
-                git, '--git-dir=@0@/.git'.format(meson.project_source_root()),
-                     'ls-files', ':/*.[ch]', ':/*.cc',
-                check : false)
-        if all_files.returncode() == 0
-                existing_files = []
-                foreach f : all_files.stdout().split()
-                        if fs.exists(f)
-                                existing_files += f
-                        endif
-                endforeach
-                all_files = files(existing_files)
-
-                custom_target(
-                        output : 'tags',
-                        command : [env, 'etags', '-o', '@0@/TAGS'.format(meson.project_source_root())] + all_files)
-                run_target(
-                        'ctags',
-                        command : [env, 'ctags', '--tag-relative=never', '-o', '@0@/tags'.format(meson.project_source_root())] + all_files)
-        endif
-
-        ####################################################
-
-        run_target(
-                'git-contrib',
-                command : git_contrib_sh)
-
-        ####################################################
-
-        git_head = run_command(
-                git, '--git-dir=@0@/.git'.format(meson.project_source_root()),
-                     'rev-parse', 'HEAD',
-                check : false).stdout().strip()
-        git_head_short = run_command(
-                git, '--git-dir=@0@/.git'.format(meson.project_source_root()),
-                     'rev-parse', '--short=7', 'HEAD',
-                check : false).stdout().strip()
-
-        run_target(
-                'git-snapshot',
-                command : [git, 'archive',
-                           '-o', '@0@/systemd-@1@.tar.gz'.format(meson.project_source_root(),
-                                                                 git_head_short),
-                           '--prefix', f'systemd-@git_head@/',
-                           'HEAD'])
-endif
-
-#####################################################################
-
 alias_target('gensources', generated_sources)
 
 clang_tidy = find_program('clang-tidy', required : false)

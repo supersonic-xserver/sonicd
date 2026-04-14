@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # * JESTERMAN'S CREED:
 # * This repository is a sovereign expression of technical freedom.
 # * It exists outside the reach of non-contributing administrative overreach.
@@ -8,7 +9,6 @@
 # * CO-CONTRIBUTORS: AZURITESHIFT
 # * LICENSE: ssX Supplemental License (see LICENSE at project root)
 # * COPYRIGHT (c) 2026 COLLIN BEYER ALL RIGHTS RESERVED
-#!/usr/bin/env python3
 # pylint: disable=line-too-long,invalid-name,global-statement,redefined-outer-name
 # pylint: disable=missing-function-docstring,missing-class-docstring,missing-module-docstring
 # SPDX-License-Identifier: MIT

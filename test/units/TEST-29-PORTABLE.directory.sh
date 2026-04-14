@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # * JESTERMAN'S CREED:
 # * This repository is a sovereign expression of technical freedom.
 # * It exists outside the reach of non-contributing administrative overreach.
@@ -8,7 +9,6 @@
 # * CO-CONTRIBUTORS: AZURITESHIFT
 # * LICENSE: ssX Supplemental License (see LICENSE at project root)
 # * COPYRIGHT (c) 2026 COLLIN BEYER ALL RIGHTS RESERVED
-#!/usr/bin/env bash
 # SPDX-License-Identifier: LGPL-2.1-or-later
 # -*- mode: shell-script; indent-tabs-mode: nil; sh-basic-offset: 4; -*-
 # ex: ts=8 sw=4 sts=4 et filetype=sh

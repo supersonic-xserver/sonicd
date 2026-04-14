@@ -1608,12 +1608,9 @@ int user_record_load(UserRecord *h, sd_json_variant *v, UserRecordLoadFlags load
                 { "emailAddress",               SD_JSON_VARIANT_STRING,        sd_json_dispatch_string,              offsetof(UserRecord, email_address),                 SD_JSON_STRICT },
                 { "iconName",                   SD_JSON_VARIANT_STRING,        sd_json_dispatch_string,              offsetof(UserRecord, icon_name),                     SD_JSON_STRICT },
                 { "location",                   SD_JSON_VARIANT_STRING,        sd_json_dispatch_string,              offsetof(UserRecord, location),                      0              },
-<<<<<<< HEAD
-=======
-                { "birthDate",                  SD_JSON_VARIANT_STRING,        json_dispatch_birth_date,             offsetof(UserRecord, birth_date),                    0              },
+                /*{ "birthDate",                  SD_JSON_VARIANT_STRING,        json_dispatch_birth_date,             offsetof(UserRecord, birth_date),                    0              },*/
                 /* Admin-only: excluded from selfModifiableFields */
                 { "bypassAgeVerification",       SD_JSON_VARIANT_BOOLEAN,       sd_json_dispatch_stdbool,            offsetof(UserRecord, bypass_age_verification),       0              },
->>>>>>> b3872ec21c (feat(ssx): Sovereign alignment and architecture update for sonicd)
                 { "disposition",                SD_JSON_VARIANT_STRING,        json_dispatch_user_disposition,       offsetof(UserRecord, disposition),                   0              },
                 { "lastChangeUSec",             _SD_JSON_VARIANT_TYPE_INVALID, sd_json_dispatch_uint64,              offsetof(UserRecord, last_change_usec),              0              },
                 { "lastPasswordChangeUSec",     _SD_JSON_VARIANT_TYPE_INVALID, sd_json_dispatch_uint64,              offsetof(UserRecord, last_password_change_usec),     0              },
