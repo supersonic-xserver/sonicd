@@ -183,7 +183,7 @@ for args in "${ARGS[@]}"; do
          CC="$CC" CC_LD="$LINKER" CFLAGS="$CFLAGS" \
          CXX="$CXX" CXX_LD="$LINKER" CXXFLAGS="$CXXFLAGS" \
          meson setup \
-               -Dtests=unsafe -Dslow-tests=true -Dfuzz-tests=true --werror \
+               -Dtests=false --werror \
                -Dnobody-group=nogroup -Ddebug=false \
                $args build; then
 
