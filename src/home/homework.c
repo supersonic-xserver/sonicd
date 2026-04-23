@@ -1520,7 +1520,7 @@ static int home_remove(UserRecord *h) {
                         return log_error_errno(errno, "Failed to stat %s: %m", ip);
 
                 if (S_ISREG(st.st_mode)) {
-                        if (unlinkat(fd, /* name= */ NULL, 0) < 0) {
+                        if (unlinkat(fd, "", AT_EMPTY_PATH) < 0) {
                                 if (errno != ENOENT)
                                         return log_error_errno(errno, "Failed to remove %s: %m", ip);
                         } else {

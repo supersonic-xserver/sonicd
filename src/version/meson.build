@@ -10,17 +10,20 @@
 # * COPYRIGHT (c) 2026 COLLIN BEYER ALL RIGHTS RESERVED
 # SPDX-License-Identifier: LGPL-2.1-or-later
 
-vcs_tag = get_option('vcs-tag')
-version_h = custom_target('version',
-        build_always_stale : vcs_tag,
-        input : 'version.h.in',
+# Static version - bypass VCS querying to prevent build hangs
+VERSION_STRING = 'sonicd-261-custom'
+
+# Generate version.h using custom_target to create a proper Target
+# Use a wrapper script or direct command approach
+version_h = custom_target(
+        'version.h',
         output : 'version.h',
-        capture : true,
+        input : 'version.h.in',
         command : [
-                vcs_tag_sh,
-                '@INPUT@',
-                get_option('mode'),
-                vcs_tag ? '1' : '0',
-        ])
+                'sh', '-c',
+                'VERSION_STRING=sonicd-261-custom && sed "s/@VERSION_STRING@/$VERSION_STRING/g" < @INPUT@ > @OUTPUT@',
+        ],
+)
+
 version_include = include_directories('.')
 userspace_sources += [version_h]

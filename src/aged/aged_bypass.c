@@ -108,6 +108,11 @@ static int on_bus(sd_bus_message *message, void *userdata, sd_bus_error *error) 
         return 0;
 }
 
+/* Only compile the standalone main() when not integrated into the main daemon.
+ * When AGED_BYPASS_INTEGRATED is defined, we skip this to avoid duplicate symbol
+ * errors (the main daemon already has its own main() function). */
+#ifndef AGED_BYPASS_INTEGRATED
+
 static int run(int argc, char *argv[]) {
         _cleanup_(sd_bus_flush_close_unrefp) sd_bus *bus = NULL;
         int r;
@@ -155,6 +160,8 @@ static int run(int argc, char *argv[]) {
 }
 
 DEFINE_MAIN_FUNCTION(run);
+
+#endif /* AGED_BYPASS_INTEGRATED */
 
 int init_aged_bypass(void) {
         int r;

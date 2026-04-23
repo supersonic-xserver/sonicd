@@ -243,17 +243,6 @@ static int vl_method_get_user_record(sd_varlink *link, sd_json_variant *paramete
             (p.name && !user_record_matches_user_name(hr, p.name)))
                 return sd_varlink_error(link, "io.systemd.UserDatabase.ConflictingRecordFound", NULL);
 
-        /* Determine if the caller is privileged (root or the user themselves) */
-        uid_t peer_uid;
-        bool trusted;
-
-        r = sd_varlink_get_peer_uid(link, &peer_uid);
-        if (r < 0) {
-                log_debug_errno(r, "Unable to query peer UID, ignoring: %m");
-                trusted = false;
-        } else
-                trusted = peer_uid == 0 || peer_uid == hr->uid;
-
         _cleanup_(sd_json_variant_unrefp) sd_json_variant *v = NULL;
         r = build_user_json(link, hr, &v);
         if (r < 0)

@@ -184,6 +184,7 @@ efi_c_args = [
         '-ffreestanding',
         '-fno-strict-aliasing',
         '-fshort-wchar',
+        '-fno-plt',
         '-include', 'efi-config.h',
 ]
 

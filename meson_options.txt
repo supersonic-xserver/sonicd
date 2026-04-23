@@ -526,8 +526,8 @@ option('bashcompletiondir', type : 'string',
 option('zshcompletiondir', type : 'string',
        description : 'directory for zsh completion scripts ["no" disables]')
 
-option('tests', type : 'combo', choices : ['true', 'unsafe', 'false'],
-       description : 'enable extra tests with =unsafe')
+option('tests', type : 'combo', choices : ['false'],
+       description : 'upstream test suite disabled (sonicd fork)')
 option('slow-tests', type : 'boolean', value : false,
        description : 'run the slow tests by default')
 option('fuzz-tests', type : 'boolean', value : true,

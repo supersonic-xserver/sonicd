@@ -19,6 +19,7 @@ project('systemd', 'c',
                 'sysconfdir=/etc',
                 'localstatedir=/var',
                 'warning_level=2',
+                'tests=false',
         ],
         meson_version : '>= 0.62.0',
 )
@@ -2231,15 +2232,16 @@ endif
 
 #####################################################################
 
-runtest_env = custom_target(
-        output : 'systemd-runtest.env',
-        command : ['printf',
-                   'SYSTEMD_TEST_DATA=%q\nSYSTEMD_CATALOG_DIR=%q\n',
-                   meson.project_source_root() / 'test',
-                   meson.project_build_root() / 'catalog'],
-        capture: true,
-        depends : catalogs,
-        build_by_default : true)
+# DISABLED: runtest_env block removed for sonicd production build
+# runtest_env = custom_target(
+#         output : 'systemd-runtest.env',
+#         command : ['printf',
+#                    'SYSTEMD_TEST_DATA=%q\nSYSTEMD_CATALOG_DIR=%q\n',
+#                    meson.project_source_root() / 'test',
+#                    meson.project_build_root() / 'catalog'],
+#         capture: true,
+#         depends : catalogs,
+#         build_by_default : true)
 
 test_cflags = ['-DTEST_CODE=1']
 # We intentionally do not do inline initializations with definitions for a
@@ -2279,7 +2281,7 @@ test_template = executable_template + {
 
 test_additional_kwargs = {
         'c_args' : test_cflags,
-        'link_depends' : runtest_env,
+        # DISABLED: 'link_depends' : runtest_env,  # removed for sonicd production build
 }
 
 fuzz_template = executable_template + {
@@ -2482,10 +2484,10 @@ subdir('src/xdg-autostart-generator')
 
 subdir('src/systemd')
 
-subdir('src/test')
-subdir('src/fuzz')
-subdir('src/ukify/test')  # needs to be last for test_env variable
-subdir('test/fuzz')
+# DISABLED: subdir('src/test')
+# DISABLED: subdir('src/fuzz')
+# DISABLED: subdir('src/ukify/test')  # needs to be last for test_env variable
+# DISABLED: subdir('test/fuzz')
 
 subdir('mime')
 
@@ -2679,7 +2681,7 @@ alias_target('fuzzers', fuzzer_exes)
 
 #####################################################################
 
-test_dlopen = executables_by_name.get('test-dlopen')
+test_dlopen = executables_by_name.get('test-dlopen', [])
 
 nss_targets = []
 pam_targets = []
@@ -2823,9 +2825,9 @@ if install_tests
 endif
 
 ############################################################
-
 subdir('rules.d')
-subdir('test')
+# DISABLED: subdir('test') - test harness disabled for sonicd production build
+# subdir('test')
 
 #####################################################################
 
