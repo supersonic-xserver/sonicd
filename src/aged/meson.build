@@ -1,14 +1,8 @@
-# * JESTERMAN'S CREED:
-# * This repository is a sovereign expression of technical freedom.
-# * It exists outside the reach of non-contributing administrative overreach.
-# * The creator's intent is the absolute law of this tree.
-# *
-# * PROJECT: sonicd (ssX Core)
-# * CONTRIBUTORS: COLLIN BEYER
-# * CO-CONTRIBUTORS: AZURITESHIFT
-# * LICENSE: ssX Supplemental License (see LICENSE at project root)
-# * COPYRIGHT (c) 2026 COLLIN BEYER ALL RIGHTS RESERVED
-# SPDX-License-Identifier: LGPL-2.1-or-later
+# src/aged/meson.build
+
+# Define include directories - need libsystemd_includes for sd-bus.h, sd-event.h,
+# etc., and src/shared for main-func.h.
+aged_includes = [libsystemd_includes, include_directories('.', '../shared')]
 
 aged_bypass_sources = files(
         'aged_bypass.c',
@@ -19,16 +13,22 @@ agectl_sources = files(
 )
 
 # Create a static library for integration with the main daemon
+# Note: We must include config.h for build-time macros like SD_BOOT, HAVE_WARNING_*,
+# RELATIVE_SOURCE_PATH, etc. that are needed by fundamental headers.
 libaged_bypass = static_library(
         'aged-bypass',
         aged_bypass_sources,
-        include_directories : includes,
+        include_directories : aged_includes,
+        c_args : ['-DAGED_BYPASS_ENABLED', '-include', 'config.h'],
 )
 
 # Add to global sources for linking with daemon
 sources += libaged_bypass
 
 # Keep the standalone executable for testing
+# Note: Do NOT include 'include_directories' here - the main meson.build
+# handles adding the source directory automatically, and using += on
+# IncludeDirs objects is not supported in Meson.
 executables += [
         executable_template + {
                 'name' : 'aged-bypass',
