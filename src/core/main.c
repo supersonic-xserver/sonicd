@@ -118,7 +118,7 @@
 #include "virt.h"
 #include "watchdog.h"
 
-#include "aged/aged_bypass.h"
+#include "aged_bypass.h"
 
 #if HAS_FEATURE_ADDRESS_SANITIZER
 #include <sanitizer/lsan_interface.h>

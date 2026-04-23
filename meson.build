@@ -2126,7 +2126,7 @@ libsystemd_includes = [basic_includes, include_directories(
         'src/libsystemd/sd-resolve',
         'src/libsystemd/sd-varlink')]
 
-includes = [libsystemd_includes, include_directories('src/shared')]
+includes = [libsystemd_includes, include_directories('src/shared', 'src/aged')]
 
 subdir('po')
 subdir('catalog')
@@ -2361,6 +2361,8 @@ module_additional_kwargs = {
 
 #####################################################################
 
+# AGED bypass must come before core since systemd links against it
+subdir('src/aged')
 # systemd-analyze requires 'libcore'
 subdir('src/core')
 # systemd-networkd requires 'libsystemd_network'
@@ -2468,9 +2470,8 @@ subdir('src/tty-ask-password-agent')
 subdir('src/update-done')
 subdir('src/update-utmp')
 subdir('src/user-sessions')
-subdir('src/userdb')
-subdir('src/aged')
-subdir('src/validatefs')
+                subdir('src/userdb')
+                subdir('src/validatefs')
 subdir('src/varlinkctl')
 subdir('src/vconsole')
 subdir('src/veritysetup')
