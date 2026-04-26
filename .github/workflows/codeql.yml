@@ -1,0 +1,68 @@
+name: "SonicD Analysis"
+
+on:
+  push:
+    branches: [ "main", "develop" ]
+  pull_request:
+    branches: [ "main" ]
+  schedule:
+    - cron: '30 18 * * 1'
+
+jobs:
+  analyze:
+    name: Analyze
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'cpp' ] # CodeQL uses 'cpp' for both C and C++
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          meson \
+          ninja-build \
+          clang-tidy \
+          libwayland-dev \
+          wayland-protocols \
+          libdrm-dev \
+          libx11-dev \
+          libffi-dev
+
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v3
+      with:
+        languages: ${{ matrix.language }}
+        queries: security-extended,security-and-quality
+
+    - name: Configure Meson
+      run: |
+        meson setup builddir \
+          --buildtype=debug \
+          -Doptimization=0 \
+          -Dwarning_level=2
+
+    - name: Build SonicD
+      run: |
+        meson compile -C builddir
+
+    - name: Run clang-tidy
+      run: |
+        # Use ninja to run clang-tidy against the compile_commands.json
+        # This assumes the source files are in src/
+        run-clang-tidy -p builddir "src/.*\.c$"
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v3
+      with:
+        category: "/language:${{matrix.language}}"
