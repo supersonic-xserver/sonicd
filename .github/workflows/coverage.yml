@@ -24,7 +24,7 @@ jobs:
     if: github.repository == 'systemd/systemd' || github.repository == 'systemd/systemd-stable'
 
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
         with:
           persist-credentials: false
       - uses: systemd/mkosi@66d51024b7149f40be4702e84275c936373ace97
@@ -130,7 +130,7 @@ jobs:
             --quiet
 
       - name: Archive failed test journals
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v7.0.1
         if: failure() && (github.repository == 'systemd/systemd' || github.repository == 'systemd/systemd-stable')
         with:
           name: ci-coverage-${{ github.run_id }}-${{ github.run_attempt }}-arch-rolling-failed-test-journals
