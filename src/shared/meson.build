@@ -134,7 +134,6 @@ shared_sources = files(
         'lsm-util.c',
         'machine-bind-user.c',
         'machine-credential.c',
-        'machine-id-setup.c',
         'machine-register.c',
         'macvlan-util.c',
         'main-func.c',
