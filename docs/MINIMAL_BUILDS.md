@@ -12,7 +12,7 @@ The core components are always built (which includes systemd itself, as well as 
 Many of the other components can be disabled at compile time with configure switches.
 
 For some uses the configure switches do not provide sufficient modularity.
-For example, they cannot be used to build only the man pages, or to build only the tmpfiles tool, only detect-virt or only udevd.
+For example, they cannot be used to build only the man pages, or to build only the tmpfiles tool, only /* REMOVED */ or only udevd.
 
 If such modularity is required that goes beyond what we support in the configure script we can suggest you two options:
 

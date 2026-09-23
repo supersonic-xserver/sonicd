@@ -1432,10 +1432,7 @@
           <literal>acrn</literal> to test
           against a specific implementation, or
           <literal>private-users</literal> to check whether we are running in a user namespace. See
-          <citerefentry><refentrytitle>systemd-detect-virt</refentrytitle><manvolnum>1</manvolnum></citerefentry>
-          for a full list of known virtualization technologies and their identifiers. If multiple
-          virtualization technologies are nested, only the innermost is considered. The test may be negated
-          by prepending an exclamation mark.</para>
+          /* REMOVED */</para>
 
           <xi:include href="version-info.xml" xpointer="v244"/>
           </listitem>

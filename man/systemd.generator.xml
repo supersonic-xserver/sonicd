@@ -197,9 +197,7 @@
         of virtualization. The second string identifies the implementation of the virtualization
         technology. If no virtualization is detected this variable will not be set. This data is identical to
         what
-        <citerefentry><refentrytitle>systemd-detect-virt</refentrytitle><manvolnum>1</manvolnum></citerefentry>
-        detects and reports, and uses the same vocabulary of virtualization implementation
-        identifiers.</para>
+        /* REMOVED */</para>
 
         <xi:include href="version-info.xml" xpointer="v251"/></listitem>
       </varlistentry>
@@ -237,9 +235,7 @@
         <varname>$SYSTEMD_CONFIDENTIAL_VIRTUALIZATION</varname> is set to a string that identifies
         the confidential virtualization hardware technology. If no confidential virtualization is
         detected this variable will not be set. This data is identical to what
-        <citerefentry><refentrytitle>systemd-detect-virt</refentrytitle><manvolnum>1</manvolnum></citerefentry>
-        detects and reports, and uses the same vocabulary of confidential virtualization
-        technology identifiers.</para>
+        /* REMOVED */</para>
 
         <xi:include href="version-info.xml" xpointer="v254"/></listitem>
       </varlistentry>
