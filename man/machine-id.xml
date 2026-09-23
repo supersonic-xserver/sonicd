@@ -74,12 +74,6 @@
     specific machine, <filename>/etc/machine-id</filename> should be populated during
     installation.</para>
 
-    <para>
-    <citerefentry><refentrytitle>systemd-machine-id-setup</refentrytitle><manvolnum>1</manvolnum></citerefentry>
-    may be used by installer tools to initialize the machine ID at install time, but
-    <filename>/etc/machine-id</filename> may also be written using any other means.
-    </para>
-
     <para>For operating system images which are created once and used on multiple machines, for example for
     containers or in the cloud, <filename>/etc/machine-id</filename> should be either missing or an empty
     file in the generic file system image (the difference between the two options is described under "First
@@ -111,11 +105,6 @@
     will attempt to bind-mount a temporary file over <filename>/etc/machine-id</filename>.
     It is an error if the file system is read-only and does not contain a (possibly empty)
     <filename>/etc/machine-id</filename> file.</para>
-
-    <para><citerefentry><refentrytitle>systemd-machine-id-commit.service</refentrytitle><manvolnum>8</manvolnum></citerefentry>
-    will attempt to write the machine ID to the file system if
-    <filename>/etc/machine-id</filename> or <filename>/etc/</filename> are read-only during
-    early boot but become writable later on.</para>
   </refsect1>
 
   <refsect1>
@@ -191,7 +180,6 @@ id[8] = (id[8] &amp; 0x3F) | 0x80;</programlisting>
       <title>See Also</title>
       <para><simplelist type="inline">
         <member><citerefentry><refentrytitle>systemd</refentrytitle><manvolnum>1</manvolnum></citerefentry></member>
-        <member><citerefentry><refentrytitle>systemd-machine-id-setup</refentrytitle><manvolnum>1</manvolnum></citerefentry></member>
         <member><citerefentry project='man-pages'><refentrytitle>gethostid</refentrytitle><manvolnum>3</manvolnum></citerefentry></member>
         <member><citerefentry><refentrytitle>hostname</refentrytitle><manvolnum>5</manvolnum></citerefentry></member>
         <member><citerefentry><refentrytitle>machine-info</refentrytitle><manvolnum>5</manvolnum></citerefentry></member>

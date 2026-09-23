@@ -174,22 +174,6 @@
       </varlistentry>
 
       <varlistentry>
-        <term><option>--setup-machine-id</option></term>
-
-        <listitem><para>Initialize the system's machine ID to a random ID. This controls the
-        <citerefentry><refentrytitle>machine-id</refentrytitle><manvolnum>5</manvolnum></citerefentry> file.
-        </para>
-
-        <para>This option only works in combination with <option>--root=</option> or
-        <option>--image=</option>. On a running system, <filename>machine-id</filename> is written by the
-        manager with help from
-        <citerefentry><refentrytitle>systemd-machine-id-commit.service</refentrytitle><manvolnum>8</manvolnum></citerefentry>.
-        </para>
-
-        <xi:include href="version-info.xml" xpointer="v216"/></listitem>
-      </varlistentry>
-
-      <varlistentry>
         <term><option>--machine-id=<replaceable>ID</replaceable></option></term>
 
         <listitem><para>Set the system's machine ID to the specified value. The same restrictions apply
@@ -505,7 +489,6 @@
       <member><citerefentry><refentrytitle>hostname</refentrytitle><manvolnum>5</manvolnum></citerefentry></member>
       <member><citerefentry><refentrytitle>machine-id</refentrytitle><manvolnum>5</manvolnum></citerefentry></member>
       <member><citerefentry project='die-net'><refentrytitle>shadow</refentrytitle><manvolnum>5</manvolnum></citerefentry></member>
-      <member><citerefentry><refentrytitle>systemd-machine-id-setup</refentrytitle><manvolnum>1</manvolnum></citerefentry></member>
       <member><citerefentry project='man-pages'><refentrytitle>localectl</refentrytitle><manvolnum>1</manvolnum></citerefentry></member>
       <member><citerefentry><refentrytitle>timedatectl</refentrytitle><manvolnum>1</manvolnum></citerefentry></member>
       <member><citerefentry><refentrytitle>hostnamectl</refentrytitle><manvolnum>1</manvolnum></citerefentry></member>

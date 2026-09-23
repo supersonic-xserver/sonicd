@@ -1103,8 +1103,6 @@ manpages = [
  ['systemd-localed.service', '8', ['systemd-localed'], 'ENABLE_LOCALED'],
  ['systemd-logind.service', '8', ['systemd-logind'], 'ENABLE_LOGIND'],
  ['systemd-loop@.service', '8', [], ''],
- ['systemd-machine-id-commit.service', '8', [], ''],
- ['systemd-machine-id-setup', '1', [], ''],
  ['systemd-machined.service', '8', ['systemd-machined'], 'ENABLE_MACHINED'],
  ['systemd-makefs@.service',
   '8',

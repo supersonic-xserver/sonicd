@@ -509,10 +509,6 @@ units = [
         },
         { 'file' : 'systemd-loop@.service' },
         {
-          'file' : 'systemd-machine-id-commit.service',
-          'symlinks' : ['sysinit.target.wants/'],
-        },
-        {
           'file' : 'systemd-machined.service.in',
           'conditions' : ['ENABLE_MACHINED'],
           'symlinks' : ['dbus-org.freedesktop.machine1.service'],
