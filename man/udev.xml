@@ -290,7 +290,7 @@
                   <term><literal>virt</literal></term>
                   <listitem>
                     <para>System's virtualization environment. See
-                    <citerefentry><refentrytitle>systemd-detect-virt</refentrytitle><manvolnum>1</manvolnum></citerefentry>
+                    /* REMOVED */
                     for possible values.</para>
 
                     <xi:include href="version-info.xml" xpointer="v244"/>
@@ -300,7 +300,7 @@
                   <term><literal>cvm</literal></term>
                   <listitem>
                     <para>System's confidential virtualization technology. See
-                    <citerefentry><refentrytitle>systemd-detect-virt</refentrytitle><manvolnum>1</manvolnum></citerefentry>
+                    /* REMOVED */
                     for possible values.</para>
 
                     <xi:include href="version-info.xml" xpointer="v254"/>

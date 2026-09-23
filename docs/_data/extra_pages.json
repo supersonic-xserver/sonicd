@@ -266,11 +266,6 @@
   },
   {
     "category": "The systemd for Administrators Blog Series",
-    "title": "#19: Detecting Virtualization",
-    "url": "https://0pointer.de/blog/projects/detect-virt.html"
-  },
-  {
-    "category": "The systemd for Administrators Blog Series",
     "title": "#20: Socket Activated Internet Services and OS Containers",
     "url": "https://0pointer.de/blog/projects/socket-activated-containers.html"
   },

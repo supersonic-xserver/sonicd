@@ -65,9 +65,6 @@ debug-generator:
 delta:
   - changed-files:
     - any-glob-to-any-file: '**/*delta*'
-detect-virt:
-  - changed-files:
-    - any-glob-to-any-file: '**/*virt*'
 dissect:
   - changed-files:
     - any-glob-to-any-file: '**/*dissect*'

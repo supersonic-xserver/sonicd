@@ -54,7 +54,6 @@ foreach item : [
         ['systemd-creds',       ''],
         ['systemd-cryptenroll', 'HAVE_LIBCRYPTSETUP'],
         ['systemd-delta',       ''],
-        ['systemd-detect-virt', ''],
         ['systemd-dissect',     'HAVE_BLKID'],
         ['systemd-hwdb',        'ENABLE_HWDB'],
         ['systemd-id128',       ''],
